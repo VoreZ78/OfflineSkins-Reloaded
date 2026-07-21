@@ -1,4 +1,4 @@
-# offlineskins-1.21.11-fabric
+# OfflineSkins-Reloaded-1.21.11-fabric
 
 OfflineSkins for Minecraft Fabric 1.21.11.
 
