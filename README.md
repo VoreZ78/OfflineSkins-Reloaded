@@ -1,6 +1,6 @@
-# offlineskins-1.21.10-fabric
+# offlineskins-1.21.11-1.21.9
 
-OfflineSkins for Minecraft Fabric 1.21.11-1.21.9.
+OfflineSkins for Minecraft 1.21.11-1.21.9.
 
 This mod allows offline skins and capes to be loaded from the local cache, making them available even when Mojang services are unavailable or when playing in offline mode.
 
