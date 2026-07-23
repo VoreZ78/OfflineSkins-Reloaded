@@ -11,15 +11,15 @@ public final class GameProfileCompat {
     }
 
     public static UUID id(GameProfile profile) {
-        return profile == null ? null : profile.getId();
+        return profile == null ? null : profile.id();
     }
 
     public static String name(GameProfile profile) {
-        return profile == null ? null : profile.getName();
+        return profile == null ? null : profile.name();
     }
 
     public static PropertyMap properties(GameProfile profile) {
-        return profile == null ? null : profile.getProperties();
+        return profile == null ? null : profile.properties();
     }
 
 }
