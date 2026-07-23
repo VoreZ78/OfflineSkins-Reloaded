@@ -12,7 +12,7 @@ public class MinecraftUtils {
     }
 
     public static MinecraftSessionService getSessionService() {
-        return MinecraftClient.getInstance().getSessionService();
+        return MinecraftClient.getInstance().getApiServices().sessionService();
     }
 
 }
