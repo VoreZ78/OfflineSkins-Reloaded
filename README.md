@@ -1,6 +1,6 @@
-# OfflineSkins-Reloaded-1.21.11-1.21.9
+# OfflineSkins-Reloaded-1.21.11-1.21.6
 
-OfflineSkins Reloaded for Minecraft 1.21.11-1.21.9.
+OfflineSkins Reloaded for Minecraft 1.21.11-1.21.6.
 
 This mod allows offline skins and capes to be loaded from the local cache, making them available even when Mojang services are unavailable or when playing in offline mode.
 
@@ -60,7 +60,7 @@ The filename must match the player's username.
 - Author: zlainsama
 - Original Repository: https://github.com/zlainsama/OfflineSkins
 
-### Minecraft 1.21.11 Fabric Port
+### Minecraft Fabric Port
 
 - Author: VoreZ
 - Repository: https://github.com/VoreZ78/offlineskins
