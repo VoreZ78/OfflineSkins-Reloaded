@@ -5,9 +5,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.init.fabric.FabricOfflineSkins;
-import net.minecraft.entity.player.PlayerSkinType;
-import net.minecraft.entity.player.SkinTextures;
-import net.minecraft.util.AssetInfo;
+import net.minecraft.client.util.SkinTextures;
+import net.minecraft.client.util.SkinTextures.Model;
 import net.minecraft.util.Identifier;
 
 import java.util.Objects;
@@ -20,11 +19,7 @@ public class SkinUtils {
 
     private static final Function<GameProfile, Identifier> SKIN = profile -> FabricOfflineSkins.getLocationSkin(profile, null);
     private static final Function<GameProfile, Identifier> CAPE = profile -> FabricOfflineSkins.getLocationCape(profile, null);
-    private static final Function<GameProfile, PlayerSkinType> MODEL = profile -> PlayerSkinType.byModelMetadata(FabricOfflineSkins.getSkinType(profile, null));
-
-    private static AssetInfo.TextureAsset textureAsset(Identifier id) {
-        return id == null ? null : new AssetInfo.TextureAssetInfo(id, id);
-    }
+    private static final Function<GameProfile, Model> MODEL = profile -> Model.fromName(FabricOfflineSkins.getSkinType(profile, null));
 
     private static final LoadingCache<GameProfile, Supplier<SkinTextures>> textureSuppliers = CacheBuilder
             .newBuilder()
@@ -37,15 +32,17 @@ public class SkinUtils {
                         SkinTextures textures = holder.get();
                         Identifier skinTexture = SKIN.apply(profile);
                         Identifier capeTexture = CAPE.apply(profile);
-                        PlayerSkinType model = MODEL.apply(profile);
+                        Model model = MODEL.apply(profile);
 
                         if (textures == null) {
                             if (skinTexture != null) {
-                                SkinTextures created = SkinTextures.create(
-                                        textureAsset(skinTexture),
-                                        textureAsset(capeTexture),
+                                SkinTextures created = new SkinTextures(
+                                        skinTexture,
                                         null,
-                                        model
+                                        capeTexture,
+                                        null,
+                                        model,
+                                        false
                                 );
                                 if (!holder.compareAndSet(null, created)) {
                                     textures = holder.get();
@@ -54,15 +51,17 @@ public class SkinUtils {
                                 }
                             }
                         } else if (skinTexture != null) {
-                            Identifier currentSkin = textures.body() != null ? textures.body().id() : null;
-                            Identifier currentCape = textures.cape() != null ? textures.cape().id() : null;
+                            Identifier currentSkin = textures.texture();
+                            Identifier currentCape = textures.capeTexture();
 
                             if (!skinTexture.equals(currentSkin) || !Objects.equals(capeTexture, currentCape) || textures.model() != model) {
-                                SkinTextures created = SkinTextures.create(
-                                        textureAsset(skinTexture),
-                                        textureAsset(capeTexture),
+                                SkinTextures created = new SkinTextures(
+                                        skinTexture,
                                         null,
-                                        model
+                                        capeTexture,
+                                        null,
+                                        model,
+                                        false
                                 );
                                 if (!holder.compareAndSet(textures, created)) {
                                     textures = holder.get();
