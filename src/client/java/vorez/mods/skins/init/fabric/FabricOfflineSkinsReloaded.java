@@ -11,11 +11,11 @@ import vorez.mods.skins.impl.fabric.ImageUtils;
 import vorez.mods.skins.providers.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -43,7 +43,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     private static volatile ConfigOptions lastLoadedConfig = new ConfigOptions().defaultOptions();
 
     private static Identifier generateRandomLocation() {
-        return Identifier.fromNamespaceAndPath("offlineskins-reloaded", String.format("textures/generated/%s", UUID.randomUUID()));
+        return Identifier.of("offlineskins-reloaded", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     private static String textureKey(ByteBuffer data) {
@@ -87,10 +87,10 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         Identifier location = generateRandomLocation();
         ByteBuffer readBuffer = data.asReadOnlyBuffer();
         readBuffer.rewind();
-        DynamicTexture texture = new DynamicTexture(location::toString, NativeImage.read(readBuffer));
-        Minecraft client = Minecraft.getInstance();
-        client.getTextureManager().register(location, texture);
-        // texture.upload();
+        NativeImageBackedTexture texture = new NativeImageBackedTexture(location::toString, NativeImage.read(readBuffer));
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.getTextureManager().registerTexture(location, texture);
+        texture.upload();
         textures.put(key, location);
 
         if (skin != null) {
@@ -98,7 +98,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
                 ByteBuffer removedData = s.getData();
                 if (removedData != null && key.equals(textureKey(removedData))) {
                     client.execute(() -> {
-                        client.getTextureManager().release(location);
+                        client.getTextureManager().destroyTexture(location);
                         textures.remove(key, location);
                     });
                 }
@@ -118,8 +118,8 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
             return existing;
         }
 
-        Minecraft client = Minecraft.getInstance();
-        if (client.isSameThread()) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.isOnThread()) {
             return registerTexture(data, skin, key);
         }
 
@@ -238,6 +238,9 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         if (config.useMojang) {
             SkinProviderAPI.SKIN.registerProvider(new MojangSkinProvider().withFilter(ImageUtils::legacyFilter));
         }
+        if (config.useCrafatar) {
+            SkinProviderAPI.SKIN.registerProvider(new CrafatarSkinProvider().withFilter(ImageUtils::legacyFilter));
+        }
 
         SkinProviderAPI.CAPE.clearProviders();
         SkinProviderAPI.CAPE.registerProvider(new UserManagedCapeProvider(Paths.get(".", "cachedImages")));
@@ -250,6 +253,9 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         if (config.useMojang) {
             SkinProviderAPI.CAPE.registerProvider(new MojangCapeProvider());
         }
+        if (config.useCrafatar) {
+            SkinProviderAPI.CAPE.registerProvider(new CrafatarCapeProvider());
+        }
 
         PLAYERHEADS = !config.disablePlayerHeads;
         lastLoadedConfig = config;
@@ -258,8 +264,8 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
-            if (mc.level != null) {
-                for (Player player : mc.level.players()) {
+            if (mc.world != null) {
+                for (PlayerEntity player : mc.world.getPlayers()) {
                     SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                     SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                 }
