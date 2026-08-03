@@ -25,7 +25,7 @@ loom {
     splitEnvironmentSourceSets()
 
     mods {
-        "offlineskins" {
+        "offlineskins-reloaded" {
             sourceSet sourceSets.main
             sourceSet sourceSets.client
         }

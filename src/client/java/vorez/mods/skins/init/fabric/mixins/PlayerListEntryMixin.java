@@ -10,17 +10,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PlayerInfo.class) // В MojMap класс называется PlayerInfo
+@Mixin(PlayerInfo.class)
 public abstract class PlayerListEntryMixin {
 
-    // В MojMap метод получения профиля называется getProfile
     @Shadow
     public abstract GameProfile getProfile();
 
-    // Перехватываем официальный метод getSkin() вместо обфусцированного method_52810
-    @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true, require = 1)
     private void offlineskins$getSkinTextures(CallbackInfoReturnable<PlayerSkin> info) {
-        // Убедитесь, что ваш SkinUtils.textures возвращает актуальный PlayerSkin
         PlayerSkin textures = SkinUtils.textures(getProfile());
         if (textures != null) {
             info.setReturnValue(textures);

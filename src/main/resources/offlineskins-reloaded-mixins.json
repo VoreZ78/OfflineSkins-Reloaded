@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "vorez.mods.skins.init.fabric.mixins",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "PlayerListEntryMixin",
+    "SkullBlockRendererMixin",
+    "PlayerListHudMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.authlib.GameProfile;
-import vorez.mods.skins.init.fabric.FabricOfflineSkins;
+import vorez.mods.skins.init.fabric.FabricOfflineSkinsReloaded;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.core.ClientAsset;
@@ -18,11 +18,11 @@ import java.util.function.Supplier;
 
 public class SkinUtils {
 
-    private static final Function<GameProfile, Identifier> SKIN = profile -> FabricOfflineSkins.getLocationSkin(profile, null);
-    private static final Function<GameProfile, Identifier> CAPE = profile -> FabricOfflineSkins.getLocationCape(profile, null);
+    private static final Function<GameProfile, Identifier> SKIN = profile -> FabricOfflineSkinsReloaded.getLocationSkin(profile, null);
+    private static final Function<GameProfile, Identifier> CAPE = profile -> FabricOfflineSkinsReloaded.getLocationCape(profile, null);
 
     private static final Function<GameProfile, PlayerModelType> MODEL = profile -> {
-        String type = FabricOfflineSkins.getSkinType(profile, null);
+        String type = FabricOfflineSkinsReloaded.getSkinType(profile, null);
         if (type == null) return PlayerModelType.WIDE;
         try {
             return PlayerModelType.valueOf(type.toUpperCase());

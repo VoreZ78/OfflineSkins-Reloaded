@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(PlayerTabOverlay.class)
 public abstract class PlayerListHudMixin {
 
-    @ModifyVariable(method = "extractRenderState", at = @At(value = "STORE", opcode = Opcodes.ISTORE, ordinal = 0), require = 0, remap = false)
+    @ModifyVariable(method = "extractRenderState", at = @At(value = "STORE", opcode = Opcodes.ISTORE, ordinal = 0), require = 1)
     private boolean offlineskins$forceFlag(boolean result) {
         return true;
     }

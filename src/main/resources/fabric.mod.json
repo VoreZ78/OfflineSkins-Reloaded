@@ -2,30 +2,30 @@
   "schemaVersion": 1,
   "id": "offlineskins-reloaded",
   "version": "${version}",
-  "name": "OfflineSKins Reloaded",
-  "description": "Offline skins and capes support. Original mod by zlainsama. Port to Minecraft 1.21.10 by VoreZ.",
+  "name": "OfflineSkins Reloaded",
+  "description": "Offline skins and capes support. Original mod by Zlainsama. Port to Minecraft 26.1-26.2 by VoreZ.",
   "authors": [
     "zlainsama",
     "VoreZ"
   ],
   "contact": {
-    "homepage": "https://github.com/VoreZ78/offlineskins",
-    "sources": "https://github.com/VoreZ78/offlineskins",
-    "issues": "https://github.com/VoreZ78/offlineskins/issues"
+    "homepage": "https://github.com/VoreZ78/OfflineSkins-Reloaded",
+    "sources": "https://github.com/VoreZ78/OfflineSkins-Reloaded",
+    "issues": "https://github.com/VoreZ78/OfflineSkins-Reloaded/issues"
   },
   "custom": {
     "original_project": "https://github.com/zlainsama/OfflineSkins"
   },
   "license": "MIT",
-  "icon": "assets/offlineskins/icon.png",
+  "icon": "assets/offlineskins-reloaded/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "vorez.mods.skins.init.fabric.FabricOfflineSkins"
+      "vorez.mods.skins.init.fabric.FabricOfflineSkinsReloaded"
     ]
   },
   "mixins": [
-    "offlineskins-mixins.json"
+    "offlineskins-reloaded-mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.19.3",

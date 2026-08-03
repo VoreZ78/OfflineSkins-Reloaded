@@ -1,7 +1,5 @@
 package vorez.mods.skins.impl;
 
-import com.sun.jna.platform.win32.ShTypes;
-
 public class ConfigOptions {
 
     public String HintMojang;

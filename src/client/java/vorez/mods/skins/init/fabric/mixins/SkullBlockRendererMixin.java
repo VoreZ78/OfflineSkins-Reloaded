@@ -1,6 +1,6 @@
 package vorez.mods.skins.init.fabric.mixins;
 
-import vorez.mods.skins.init.fabric.FabricOfflineSkins;
+import vorez.mods.skins.init.fabric.FabricOfflineSkinsReloaded;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SkullBlockRenderer.class)
 public abstract class SkullBlockRendererMixin {
 
-    @Inject(method = "resolveSkullRenderType", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "resolveSkullRenderType", at = @At("RETURN"), cancellable = true, require = 1)
     private void offlineskins$resolveSkullRenderType(
             SkullBlock.Type type,
             SkullBlockEntity entity,
             CallbackInfoReturnable<RenderType> cir
     ) {
-        if (!FabricOfflineSkins.PLAYERHEADS || type != Types.PLAYER) {
+        if (!FabricOfflineSkinsReloaded.PLAYERHEADS || type != Types.PLAYER) {
             return;
         }
 
@@ -32,7 +32,7 @@ public abstract class SkullBlockRendererMixin {
             return;
         }
 
-        Identifier loc = FabricOfflineSkins.getLocationSkin(ownerProfile.partialProfile(), null);
+        Identifier loc = FabricOfflineSkinsReloaded.getLocationSkin(ownerProfile.partialProfile(), null);
         if (loc != null) {
             cir.setReturnValue(RenderTypes.entityTranslucent(loc));
         }
