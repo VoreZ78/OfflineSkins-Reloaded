@@ -60,7 +60,7 @@ The filename must match the player's username.
 - Author: zlainsama
 - Original Repository: https://github.com/zlainsama/OfflineSkins
 
-### Minecraft Fabric Port
+### Minecraft 1.21.11 Fabric Port
 
 - Author: VoreZ
 - Repository: https://github.com/VoreZ78/offlineskins

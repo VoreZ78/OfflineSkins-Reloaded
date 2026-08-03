@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FabricOfflineSkins implements ClientModInitializer {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = Paths.get(".", "config", "offlineskins.json");
+    private static final Path CONFIG_PATH = Paths.get(".", "config", "offlineskins-reloaded.json");
     private static final Map<String, Identifier> textures = new ConcurrentHashMap<>();
 
     public static boolean PLAYERHEADS = true;
