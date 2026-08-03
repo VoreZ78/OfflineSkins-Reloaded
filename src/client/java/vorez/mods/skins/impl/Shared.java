@@ -86,7 +86,7 @@ public class Shared {
     }
 
     public static boolean isOfflinePlayer(UUID id, String name) {
-        if (id == null || isBlank(name))
+        if (id == null || isBlank(name)) // treat incomplete profiles as offline profiles, but don't cache results for them as they can be updated later and possibly become online profiles.
             return true;
         try {
             return offlines.get(id, () -> {

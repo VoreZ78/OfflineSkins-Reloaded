@@ -30,24 +30,24 @@ public class MojangService {
 
         @Override
         public Optional<GameProfile> load(GameProfile key) throws Exception {
-            if (key == Shared.DUMMY || GameProfileCompat.id(key) == null || GameProfileCompat.properties(key) == null)
+            if (key == Shared.DUMMY || GameProfileCompat.id(key) == null || GameProfileCompat.properties(key) == null) // bad profile
                 return Optional.empty();
-            if (!GameProfileCompat.properties(key).isEmpty())
+            if (!GameProfileCompat.properties(key).isEmpty()) // already filled
                 return Optional.of(key);
             GameProfile filled = Shared.call(() -> {
-                MinecraftUtils.getSessionService().getTextures(key);
+                MinecraftUtils.getSessionService().getTextures(key); // prime session lookup on 1.21.11
                 return key;
-            }, key, null);
+            }, key, null); // fetch it
             if (filled == key) // failed
                 return Optional.empty();
-            if (GameProfileCompat.properties(filled).isEmpty())
+            if (GameProfileCompat.properties(filled).isEmpty()) // partially filled, this won't happen in current implementation, it's here just in case.
                 return Optional.empty();
-            return Optional.of(filled);
+            return Optional.of(filled); // cache it
         }
 
         @Override
         public ListenableFuture<Optional<GameProfile>> reload(GameProfile key, Optional<GameProfile> oldValue) throws Exception {
-            if (oldValue.isPresent())
+            if (oldValue.isPresent()) // good result, doesn't need refresh.
                 return Futures.immediateFuture(oldValue);
             return Shared.submitTask(() -> {
                 return load(key);
@@ -62,7 +62,7 @@ public class MojangService {
 
         @Override
         public Optional<GameProfile> load(String key) throws Exception {
-            if (Shared.isBlank(key))
+            if (Shared.isBlank(key)) // can't resolve this
                 return Optional.of(Shared.DUMMY);
             return Optional.ofNullable(Shared.call(() -> {
                 return makeRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", key)); // request it
@@ -77,7 +77,7 @@ public class MojangService {
             conn.connect();
 
             int code = conn.getResponseCode();
-            if (code == 204 || code == 404)
+            if (code == 204 || code == 404) // not found
                 return Shared.DUMMY;
             else if (code / 100 == 2) {
                 try (InputStream in = conn.getInputStream()) {
@@ -109,8 +109,8 @@ public class MojangService {
         public ListenableFuture<Optional<GameProfile>> reload(String key, Optional<GameProfile> oldValue) throws Exception {
             if (oldValue.isPresent()) {
                 if (oldValue.get() == Shared.DUMMY)
-                    return Futures.immediateFuture(Optional.empty());
-                return Futures.immediateFuture(oldValue);
+                    return Futures.immediateFuture(Optional.empty()); // effectively schedule a refresh in next reload.
+                return Futures.immediateFuture(oldValue); // good result, doesn't need refresh.
             }
             return Shared.submitTask(() -> {
                 return load(key);
