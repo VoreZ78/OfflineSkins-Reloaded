@@ -3,7 +3,7 @@
   "id": "offlineskins-reloaded",
   "version": "${version}",
   "name": "OfflineSkins Reloaded",
-  "description": "Offline skins and capes support. Original mod by Zlainsama. Port to Minecraft 26.1-26.2 by VoreZ.",
+  "description": "Offline skins and capes support. Original mod by Zlainsama. Port to Minecraft 1.21.9-1.21.11 by VoreZ.",
   "authors": [
     "zlainsama",
     "VoreZ"
@@ -29,8 +29,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.19.3",
-    "minecraft": ">=26.1 <=26.2",
-    "java": ">=25",
-    "fabric-api": ">=0.145.1+26.1"
+    "minecraft": ">=1.21.9 <=1.21.11",
+    "java": ">=21",
+    "fabric-api": ">=0.134.1+1.21.9"
   }
 }
