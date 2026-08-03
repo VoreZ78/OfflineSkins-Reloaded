@@ -12,7 +12,6 @@ import vorez.mods.skins.impl.fabric.ImageUtils;
 import vorez.mods.skins.impl.fabric.MinecraftUtils;
 
 import java.nio.ByteBuffer;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class MojangSkinProvider implements ISkinProvider {

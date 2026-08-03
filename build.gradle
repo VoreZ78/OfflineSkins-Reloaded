@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
 
@@ -11,14 +11,6 @@ base {
 }
 
 repositories {
-    // Loom automatically adds the required repositories.
-    // Add custom repositories here only if you depend on external mods.
-}
-
-fabricApi {
-    configureDataGeneration {
-        client = true
-    }
 }
 
 loom {
@@ -34,28 +26,28 @@ loom {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 processResources {
-    def version = project.version
-    inputs.property "version", version
+    inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": version
+        expand "version": project.version
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 25
+    it.options.release = 21
 }
 
 java {
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
@@ -72,6 +64,5 @@ publishing {
     }
 
     repositories {
-        // Publishing repositories go here.
     }
 }
