@@ -1,6 +1,6 @@
-# OfflineSkins-Reloaded-1.21.11-1.21.9
+# OfflineSkins-Reloaded-26.1-26.2
 
-OfflineSkins Reloaded for Minecraft 1.21.11-1.21.9.
+OfflineSkins Reloaded for Minecraft 26.1-26.2.
 
 This mod allows offline skins and capes to be loaded from the local cache, making them available even when Mojang services are unavailable or when playing in offline mode.
 
@@ -10,7 +10,7 @@ This mod allows offline skins and capes to be loaded from the local cache, makin
 - 🦸 Offline cape support
 - 📁 Local texture cache loading
 - ⚡ Lightweight and client-side only
-- 🧩 Fabric 1.21.11-1.21.9 support
+- 🧩 Fabric 26.1-26.2 support
 - 🌍 17 languages support 
 
 ## Cached Textures
