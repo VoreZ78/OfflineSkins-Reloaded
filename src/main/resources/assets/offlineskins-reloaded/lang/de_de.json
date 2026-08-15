@@ -1,7 +1,7 @@
 {
     "modmenu.nameTranslation.offlineskins-reloaded": "OfflineSkins Reloaded",
     "modmenu.summaryTranslation.offlineskins-reloaded": "Speichert Spielerskins für die Offline-Nutzung zwischen.",
-    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded für Fabric 26.2. Speichert Spielerskins für die Offline-Nutzung zwischen.\nPortiert von VoreZ.",
+    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded für Fabric 1.21.10. Speichert Spielerskins für die Offline-Nutzung zwischen.\nPortiert von VoreZ.",
     "menu.offlineskins-reloaded.config": "OfflineSkins Reloaded Konfiguration",
     "category.offlineskins-reloaded.general": "Allgemein",
     "options.DisablePlayerHeads": "Spielerköpfe deaktivieren",
