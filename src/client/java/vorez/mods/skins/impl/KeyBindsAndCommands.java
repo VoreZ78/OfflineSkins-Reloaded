@@ -46,11 +46,7 @@ public class KeyBindsAndCommands {
                                 .executes(context -> {
                                     Minecraft client = Minecraft.getInstance();
                                     client.execute(() -> {
-                                        Screen current = client.gui.screen();
-
-                                        client.gui.setScreen(
-                                                YaclSettings.createConfigScreen(current)
-                                        );
+                                        client.setScreen(YaclSettings.createConfigScreen(client.screen));
                                     });
                                     return 1;
                                 })
@@ -69,8 +65,7 @@ public class KeyBindsAndCommands {
                                                         .withStyle(ChatFormatting.GREEN))
                                                 .append(Component.translatable("text.offlineskins-reloaded.version_text")
                                                         .withStyle(ChatFormatting.GRAY))
-                                                .append(Component.literal(version)
-                                                        .withStyle(ChatFormatting.GOLD));
+                                                .append(Component.translatable(version).withStyle((ChatFormatting.GOLD)));
 
                                         client.player.sendOverlayMessage(message);
                                     }
@@ -85,9 +80,9 @@ public class KeyBindsAndCommands {
             Minecraft client = Minecraft.getInstance();
 
             while (OPEN_CONFIG.consumeClick()) {
-                Screen current = client.gui.screen();
+                Screen current = client.screen;
 
-                client.gui.setScreen(
+                client.setScreen(
                         YaclSettings.createConfigScreen(current)
                 );
             }

@@ -67,11 +67,13 @@ public final class YaclSettings {
                     Component.translatable("toast.offlineskins.invalid_cape");
         };
 
-        SystemToast.add(
-                client.gui.toastManager(),
-                SystemToast.SystemToastId.FILE_DROP_FAILURE,
-                Component.literal(title),
-                message
+        client.getToastManager().addToast(
+                net.minecraft.client.gui.components.toasts.SystemToast.multiline(
+                        client,
+                        SystemToast.SystemToastId.FILE_DROP_FAILURE,
+                        Component.literal(title),
+                        message
+                )
         );
     }
 
@@ -180,11 +182,13 @@ public final class YaclSettings {
                             1,
                             java.util.concurrent.TimeUnit.SECONDS
                     ).execute(() -> Minecraft.getInstance().execute(() ->
-                            SystemToast.add(
-                                    Minecraft.getInstance().gui.toastManager(),
-                                    SystemToast.SystemToastId.FILE_DROP_FAILURE,
-                                    Component.translatable("button.offlineskins.reload"),
-                                    Component.translatable("toast.offlineskins.reload.success")
+                            Minecraft.getInstance().getToastManager().addToast(
+                                    SystemToast.multiline(
+                                            Minecraft.getInstance(),
+                                            SystemToast.SystemToastId.FILE_DROP_FAILURE,
+                                            Component.translatable("button.offlineskins.reload"),
+                                            Component.translatable("toast.offlineskins.reload.success")
+                                    )
                             )
                     ));
                 })
