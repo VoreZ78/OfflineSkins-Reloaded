@@ -1,6 +1,6 @@
-# OfflineSkins-Reloaded-26.2
+# OfflineSkins-Reloaded-26.1-26.1.2
 
-OfflineSkins Reloaded for Minecraft 26.2.
+OfflineSkins Reloaded for Minecraft 26.1-26.1.2.
 
 A client-side Fabric mod that allows player skins and capes to be loaded from the local cache, making them available even when Mojang services are unavailable or when playing in offline mode.
 
@@ -12,7 +12,7 @@ OfflineSkins Reloaded is a heavily reworked and optimized version of the origina
 - 🦸 Offline cape support
 - 📁 Local texture cache loading
 - ⚡ Optimized networking and lightweight client-side operation
-- 🧩 Fabric 26.2 support
+- 🧩 Fabric 26.1-26.1.2 support
 - 🌍 17 languages supported
 - ⚙️ YACL configuration menu
 - 🔍 Server and URL validation
@@ -65,7 +65,6 @@ The mod also supports custom skin and cape providers, allowing skins and capes f
 OfflineSkins Reloaded may load skins and capes from third-party services.
 Third-party services may contain user-created content that can be provocative, offensive, disturbing or otherwise inappropriate. This content is not controlled, moderated or endorsed by the OfflineSkins Reloaded project.
 Use third-party skin and cape sources at your own discretion.
-
 ```text
 cachedimages/
 ├── skins/

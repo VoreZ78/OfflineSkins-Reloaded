@@ -1,7 +1,7 @@
 {
     "modmenu.nameTranslation.offlineskins-reloaded": "OfflineSkins Reloaded",
     "modmenu.summaryTranslation.offlineskins-reloaded": "플레이어 스킨을 오프라인 사용용으로 캐시합니다.",
-    "modmenu.descriptionTranslation.offlineskins-reloaded": "Fabric 26.2용 OfflineSkins Reloaded. 플레이어 스킨을 오프라인 사용용으로 캐시합니다.\nVoreZ가 포팅함.",
+    "modmenu.descriptionTranslation.offlineskins-reloaded": "Fabric 26.1-26.1.2용 OfflineSkins Reloaded. 플레이어 스킨을 오프라인 사용용으로 캐시합니다.\nVoreZ가 포팅함.",
     "menu.offlineskins-reloaded.config": "OfflineSkins Reloaded 설정",
     "category.offlineskins-reloaded.general": "일반",
     "options.DisablePlayerHeads": "플레이어 머리 비활성화",
