@@ -22,17 +22,17 @@ public abstract class SkullBlockItemRendererMixin {
             cancellable = true
     )
     private void offlineskins$useCustomPlayerHeadSkin(
-            ResolvableProfile profile,
+            ResolvableProfile resolvableProfile,
             CallbackInfoReturnable<PlayerSkinRenderCache.RenderInfo> cir
     ) {
         if (!FabricOfflineSkinsReloaded.PLAYERHEADS) {
             return;
         }
 
-        GameProfile gameProfile = profile.partialProfile();
+        GameProfile profile = resolvableProfile.partialProfile();
 
         Identifier loc = FabricOfflineSkinsReloaded.getLocationSkin(
-                gameProfile,
+                profile,
                 null
         );
 
@@ -41,7 +41,7 @@ public abstract class SkullBlockItemRendererMixin {
         }
 
         String type = FabricOfflineSkinsReloaded.getSkinType(
-                gameProfile,
+                profile,
                 null
         );
 
@@ -58,9 +58,9 @@ public abstract class SkullBlockItemRendererMixin {
 
         cir.setReturnValue(
                 cache.new RenderInfo(
-                        gameProfile,
+                        profile,
                         playerSkin,
-                        profile.skinPatch()
+                        resolvableProfile.skinPatch()
                 )
         );
     }
