@@ -1,7 +1,7 @@
 {
     "modmenu.nameTranslation.offlineskins-reloaded": "OfflineSkins Reloaded",
     "modmenu.summaryTranslation.offlineskins-reloaded": "Met en cache les skins des joueurs pour une utilisation hors ligne.",
-    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded pour Fabric 26.2. Met en cache les skins des joueurs pour une utilisation hors ligne.\nPorté par VoreZ.",
+    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded pour Fabric 1.21.10. Met en cache les skins des joueurs pour une utilisation hors ligne.\nPorté par VoreZ.",
     "menu.offlineskins-reloaded.config": "Configuration de OfflineSkins Reloaded",
     "category.offlineskins-reloaded.general": "Général",
     "options.DisablePlayerHeads": "Désactiver les têtes des joueurs",

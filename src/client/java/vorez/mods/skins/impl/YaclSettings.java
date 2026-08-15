@@ -67,11 +67,13 @@ public final class YaclSettings {
                     Component.translatable("toast.offlineskins.invalid_cape");
         };
 
-        SystemToast.add(
-                client.gui.toastManager(),
-                SystemToast.SystemToastId.FILE_DROP_FAILURE,
-                Component.literal(title),
-                message
+        client.getToastManager().addToast(
+                net.minecraft.client.gui.components.toasts.SystemToast.multiline(
+                        client,
+                        SystemToast.SystemToastId.FILE_DROP_FAILURE,
+                        Component.literal(title),
+                        message
+                )
         );
     }
 
@@ -155,7 +157,7 @@ public final class YaclSettings {
                 )
                 .controller(option -> EnumControllerBuilder.create(option).enumClass(CustomServersList.class))
                 .build();
-        
+
         Option<Boolean> allowHTTP = Option.<Boolean>createBuilder()
                 .name(Component.translatable("options.allowHTTP"))
                 .description(OptionDescription.of(Component.translatable("tooltip.allowHTTP")))
@@ -167,27 +169,30 @@ public final class YaclSettings {
                 .controller(TickBoxControllerBuilder::create)
                 .build();
 
-        ButtonOption reloadConfig = ButtonOption.createBuilder()
-                .name(Component.translatable("button.offlineskins.reload"))
-                .text(Component.translatable("button.offlineskins.reload"))
-                .description(OptionDescription.of(
-                        Component.translatable("tooltip.offlineskins.reload")
-                ))
-                .action((screen, option) -> {
-                    FabricOfflineSkinsReloaded.reloadRuntime();
+        ButtonOption.Builder builder = ButtonOption.createBuilder();
+        builder.name(Component.translatable("button.offlineskins.reload"));
+        builder.text(Component.translatable("button.offlineskins.reload"));
+        builder.description(OptionDescription.of(
+                Component.translatable("tooltip.offlineskins.reload")
+        ));
+        builder.action((screen, option) -> {
+            FabricOfflineSkinsReloaded.reloadRuntime();
 
-                    CompletableFuture.delayedExecutor(
-                            1,
-                            java.util.concurrent.TimeUnit.SECONDS
-                    ).execute(() -> Minecraft.getInstance().execute(() ->
-                            SystemToast.add(
-                                    Minecraft.getInstance().gui.toastManager(),
+            CompletableFuture.delayedExecutor(
+                    1,
+                    java.util.concurrent.TimeUnit.SECONDS
+            ).execute(() -> Minecraft.getInstance().execute(() ->
+                    Minecraft.getInstance().getToastManager().addToast(
+                            SystemToast.multiline(
+                                    Minecraft.getInstance(),
                                     SystemToast.SystemToastId.FILE_DROP_FAILURE,
                                     Component.translatable("button.offlineskins.reload"),
                                     Component.translatable("toast.offlineskins.reload.success")
                             )
-                    ));
-                })
+                    )
+            ));
+        });
+        ButtonOption reloadConfig = builder
                 .build();
 
         Option<String> customServerSkinUrl = Option.<String>createBuilder()

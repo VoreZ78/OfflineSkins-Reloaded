@@ -1,7 +1,7 @@
 {
     "modmenu.nameTranslation.offlineskins-reloaded": "OfflineSkins Reloaded",
     "modmenu.summaryTranslation.offlineskins-reloaded": "プレイヤーのスキンをオフライン用にキャッシュします。",
-    "modmenu.descriptionTranslation.offlineskins-reloaded": "Fabric 26.2 向けの OfflineSkins Reloaded。プレイヤーのスキンをオフライン用にキャッシュします。\nVoreZ による移植。",
+    "modmenu.descriptionTranslation.offlineskins-reloaded": "Fabric 1.21.10 向けの OfflineSkins Reloaded。プレイヤーのスキンをオフライン用にキャッシュします。\nVoreZ による移植。",
     "menu.offlineskins-reloaded.config": "OfflineSkins Reloaded 設定",
     "category.offlineskins-reloaded.general": "一般",
     "options.DisablePlayerHeads": "プレイヤーの頭を無効化",
