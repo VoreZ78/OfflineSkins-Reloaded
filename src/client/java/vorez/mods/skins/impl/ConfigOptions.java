@@ -57,5 +57,19 @@ public class ConfigOptions {
 
         return any;
     }
+    public String getListSkinUrl() {
+        if (customServersList != CustomServersList.CUSTOM) {
+            return customServersList.getSkinUrl();
+        }
 
+        return linkCustomServerSkin;
+    }
+
+    public String getListCapeUrl() {
+        if (customServersList != CustomServersList.CUSTOM) {
+            return customServersList.getCapeUrl();
+        }
+
+        return linkCustomServerCape;
+    }
 }

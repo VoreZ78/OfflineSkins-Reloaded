@@ -1,7 +1,7 @@
 {
     "modmenu.nameTranslation.offlineskins-reloaded": "OfflineSkins Reloaded",
     "modmenu.summaryTranslation.offlineskins-reloaded": "Кешує скіни гравців для офлайн-використання.",
-    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded для Fabric 26.2. Кешує скіни гравців для офлайн-використання.\nПортовано VoreZ.",
+    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded для Fabric 1.21.6-1.21.8. Кешує скіни гравців для офлайн-використання.\nПортовано VoreZ.",
     "menu.offlineskins-reloaded.config": "Конфігурація OfflineSkins Reloaded",
     "category.offlineskins-reloaded.general": "Загальні",
     "options.DisablePlayerHeads": "Вимкнути голови гравців",

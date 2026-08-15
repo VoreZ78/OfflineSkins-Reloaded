@@ -1,7 +1,7 @@
 {
     "modmenu.nameTranslation.offlineskins-reloaded": "OfflineSkins Reloaded",
     "modmenu.summaryTranslation.offlineskins-reloaded": "Ukládá skiny hráčů pro offline použití.",
-    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded pro Fabric 26.2. Ukládá skiny hráčů pro offline použití.\nPortováno VoreZem.",
+    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded pro Fabric 1.21.6-1.21.8. Ukládá skiny hráčů pro offline použití.\nPortováno VoreZem.",
     "menu.offlineskins-reloaded.config": "Konfigurace pro OfflineSkins Reloaded",
     "category.offlineskins-reloaded.general": "Obecné",
     "options.DisablePlayerHeads": "Vypnout hlavy hráčů",
