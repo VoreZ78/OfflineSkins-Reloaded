@@ -1,7 +1,7 @@
 package vorez.mods.skins.init.fabric.mixins;
 
 import vorez.mods.skins.impl.YaclSettings;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,13 +20,13 @@ public abstract class PauseScreenMixin extends Screen {
     private static final Identifier BUTTON_TEXTURE =
             Identifier.fromNamespaceAndPath(
                     "offlineskins-reloaded",
-                    "mainTitleScreenButton.png"
+                    "maintitlescreenbutton.png"
             );
 
     private static final Identifier BUTTON_HIGHLIGHT_TEXTURE =
             Identifier.fromNamespaceAndPath(
                     "offlineskins-reloaded",
-                    "mainTitleScreenButtonHighlighting.png"
+                    "maintitlescreenbuttonhighlighting.png"
             );
 
     protected PauseScreenMixin(Component title) {
@@ -46,7 +46,7 @@ public abstract class PauseScreenMixin extends Screen {
                 new ConfigButton(
                         x,
                         y,
-                        button -> this.minecraft.gui.setScreen(
+                        button -> this.minecraft.setScreen(
                                 YaclSettings.createConfigScreen(this)
                         )
                 )
@@ -68,8 +68,8 @@ public abstract class PauseScreenMixin extends Screen {
         }
 
         @Override
-        protected void extractContents(
-                GuiGraphicsExtractor graphics,
+        protected void renderContents(
+                GuiGraphics graphics,
                 int mouseX,
                 int mouseY,
                 float partialTick
@@ -78,7 +78,7 @@ public abstract class PauseScreenMixin extends Screen {
                     ? BUTTON_HIGHLIGHT_TEXTURE
                     : BUTTON_TEXTURE;
 
-            int alpha = ARGB.as8BitChannel(this.getAlpha());
+            int alpha = ARGB.as8BitChannel(this.alpha);
             int color = ARGB.color(alpha, 255, 255, 255);
 
             graphics.blit(
