@@ -1,7 +1,7 @@
 {
     "modmenu.nameTranslation.offlineskins-reloaded": "OfflineSkins Reloaded",
     "modmenu.summaryTranslation.offlineskins-reloaded": "Memorizza le skin dei giocatori per l'uso offline.",
-    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded per Fabric 26.2. Memorizza le skin dei giocatori per l'uso offline.\nPortato da VoreZ.",
+    "modmenu.descriptionTranslation.offlineskins-reloaded": "OfflineSkins Reloaded per Fabric 1.21.6-1.21.8. Memorizza le skin dei giocatori per l'uso offline.\nPortato da VoreZ.",
     "menu.offlineskins-reloaded.config": "Configurazione di OfflineSkins Reloaded",
     "category.offlineskins-reloaded.general": "Generale",
     "options.DisablePlayerHeads": "Disattiva teste giocatore",

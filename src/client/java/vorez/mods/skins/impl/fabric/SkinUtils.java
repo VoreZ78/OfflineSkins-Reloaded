@@ -4,11 +4,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.client.resources.PlayerSkin;
 import vorez.mods.skins.init.fabric.FabricOfflineSkinsReloaded;
-import net.minecraft.world.entity.player.PlayerSkin;
-import net.minecraft.world.entity.player.PlayerModelType;
-import net.minecraft.core.ClientAsset;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -18,22 +16,18 @@ import java.util.function.Supplier;
 
 public class SkinUtils {
 
-    private static final Function<GameProfile, Identifier> SKIN = profile -> FabricOfflineSkinsReloaded.getLocationSkin(profile, null);
-    private static final Function<GameProfile, Identifier> CAPE = profile -> FabricOfflineSkinsReloaded.getLocationCape(profile, null);
+    private static final Function<GameProfile, ResourceLocation> SKIN = profile -> FabricOfflineSkinsReloaded.getLocationSkin(profile, null);
+    private static final Function<GameProfile, ResourceLocation> CAPE = profile -> FabricOfflineSkinsReloaded.getLocationCape(profile, null);
 
-    private static final Function<GameProfile, PlayerModelType> MODEL = profile -> {
+    private static final Function<GameProfile, PlayerSkin.Model> MODEL = profile -> {
         String type = FabricOfflineSkinsReloaded.getSkinType(profile, null);
-        if (type == null) return PlayerModelType.WIDE;
+        if (type == null) return PlayerSkin.Model.WIDE;
         try {
-            return PlayerModelType.valueOf(type.toUpperCase());
+            return PlayerSkin.Model.valueOf(type.toUpperCase(java.util.Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            return PlayerModelType.WIDE;
+            return PlayerSkin.Model.WIDE;
         }
     };
-
-    private static ClientAsset.ResourceTexture textureAsset(Identifier id) {
-        return id == null ? null : new ClientAsset.ResourceTexture(id, id);
-    }
 
     private static final LoadingCache<GameProfile, Supplier<PlayerSkin>> textureSuppliers = CacheBuilder
             .newBuilder()
@@ -44,15 +38,17 @@ public class SkinUtils {
                     AtomicReference<PlayerSkin> holder = new AtomicReference<>();
                     return () -> {
                         PlayerSkin textures = holder.get();
-                        Identifier skinTexture = SKIN.apply(profile);
-                        Identifier capeTexture = CAPE.apply(profile);
-                        PlayerModelType model = MODEL.apply(profile);
+                        ResourceLocation skinTexture = SKIN.apply(profile);
+                        ResourceLocation capeTexture = CAPE.apply(profile);
+
+                        PlayerSkin.Model model = MODEL.apply(profile);
 
                         if (textures == null) {
                             if (skinTexture != null) {
                                 PlayerSkin created = new PlayerSkin(
-                                        textureAsset(skinTexture),
-                                        textureAsset(capeTexture),
+                                        skinTexture,
+                                        null,
+                                        capeTexture,
                                         null,
                                         model,
                                         true
@@ -64,13 +60,14 @@ public class SkinUtils {
                                 }
                             }
                         } else if (skinTexture != null) {
-                            Identifier currentSkin = textures.body() != null ? textures.body().id() : null;
-                            Identifier currentCape = textures.cape() != null ? textures.cape().id() : null;
+                            ResourceLocation currentSkin = textures.texture();
+                            ResourceLocation currentCape = textures.capeTexture();
 
                             if (!skinTexture.equals(currentSkin) || !Objects.equals(capeTexture, currentCape) || textures.model() != model) {
                                 PlayerSkin created = new PlayerSkin(
-                                        textureAsset(skinTexture),
-                                        textureAsset(capeTexture),
+                                        skinTexture,
+                                        null,
+                                        capeTexture,
                                         null,
                                         model,
                                         true
@@ -91,6 +88,7 @@ public class SkinUtils {
     public static PlayerSkin textures(GameProfile profile) {
         return textureSuppliers.getUnchecked(profile).get();
     }
+
     public static void clearTextureSuppliers() {
         textureSuppliers.invalidateAll();
         textureSuppliers.cleanUp();
