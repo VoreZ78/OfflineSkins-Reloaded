@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
-import vorez.mods.skins.impl.fabric.MinecraftUtils;
+import vorez.mods.skins.impl.Utils.MinecraftUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

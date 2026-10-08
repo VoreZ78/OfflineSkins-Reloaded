@@ -1,35 +1,35 @@
 package vorez.mods.skins.init.fabric.mixins;
 
-import org.spongepowered.asm.mixin.Unique;
-import vorez.mods.skins.impl.YaclSettings;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import vorez.mods.skins.impl.YaclSettings;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
 
     @Unique
-    private static final Identifier BUTTON_TEXTURE =
-            Identifier.fromNamespaceAndPath(
+    private static final ResourceLocation BUTTON_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
                     "offlineskins-reloaded",
-                    "mainTitleScreenButton.png"
+                    "maintitlescreenbutton.png"
             );
 
     @Unique
-    private static final Identifier BUTTON_HIGHLIGHT_TEXTURE =
-            Identifier.fromNamespaceAndPath(
+    private static final ResourceLocation BUTTON_HIGHLIGHT_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
                     "offlineskins-reloaded",
-                    "mainTitleScreenButtonHighlighting.png"
+                    "maintitlescreenbuttonhighlighting.png"
             );
 
     protected TitleScreenMixin(Component title) {
@@ -38,6 +38,9 @@ public abstract class TitleScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void offlineSkinsTitleScreenButton(CallbackInfo ci) {
+        if (this.minecraft == null) {
+            return;
+        }
 
         int x = this.width / 2 - 132;
         int y = this.height / 4 + 55;
@@ -46,14 +49,14 @@ public abstract class TitleScreenMixin extends Screen {
                 new ConfigButton(
                         x,
                         y,
-                        button -> this.minecraft.setScreenAndShow(
+                        button -> this.minecraft.setScreen(
                                 YaclSettings.createConfigScreen(this)
                         )
                 )
         );
     }
-
     private static class ConfigButton extends Button {
+
         private ConfigButton(int x, int y, OnPress onPress) {
             super(
                     x,
@@ -66,19 +69,18 @@ public abstract class TitleScreenMixin extends Screen {
             );
         }
         @Override
-        protected void extractContents(
-                GuiGraphicsExtractor graphics,
+        protected void renderWidget(
+                GuiGraphics graphics,
                 int mouseX,
                 int mouseY,
                 float partialTick
         ) {
-            Identifier texture = this.isHovered()
+            ResourceLocation texture = this.isHovered()
                     ? BUTTON_HIGHLIGHT_TEXTURE
                     : BUTTON_TEXTURE;
 
             int alpha = ARGB.as8BitChannel(this.alpha);
             int color = ARGB.color(alpha, 255, 255, 255);
-
             graphics.blit(
                     RenderPipelines.GUI_TEXTURED,
                     texture,

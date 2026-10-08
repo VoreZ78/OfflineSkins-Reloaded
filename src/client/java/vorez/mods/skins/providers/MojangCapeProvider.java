@@ -8,8 +8,8 @@ import vorez.mods.skins.api.interfaces.ISkin;
 import vorez.mods.skins.api.interfaces.ISkinProvider;
 import vorez.mods.skins.impl.Shared;
 import vorez.mods.skins.impl.SkinData;
-import vorez.mods.skins.impl.fabric.ImageUtils;
-import vorez.mods.skins.impl.fabric.MinecraftUtils;
+import vorez.mods.skins.impl.Utils.ImageUtils;
+import vorez.mods.skins.impl.Utils.MinecraftUtils;
 
 import java.nio.ByteBuffer;
 import java.util.function.Function;
@@ -26,7 +26,7 @@ public class MojangCapeProvider implements ISkinProvider {
             if (!Shared.isOfflinePlayer(profile.getPlayerUUID(), profile.getPlayerName())) {
                 MinecraftProfileTexture texture = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal()).cape();
                 if (texture != null) {
-                    Shared.downloadSkin(texture.getUrl(), Runnable::run)
+                    Shared.downloadImage(texture.getUrl(), Runnable::run)
                             .thenAccept(optional -> optional.ifPresent(data -> {
                                 if (ImageUtils.validateData(data)) {
                                     skin.put(data, "cape");

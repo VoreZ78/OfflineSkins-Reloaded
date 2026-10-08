@@ -2,24 +2,27 @@ package vorez.mods.skins.init.fabric;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.logging.LogUtils;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import org.slf4j.Logger;
 import vorez.mods.skins.api.SkinProviderAPI;
 import vorez.mods.skins.api.interfaces.ISkin;
 import vorez.mods.skins.impl.ConfigOptions;
 import vorez.mods.skins.impl.KeyBindsAndCommands;
 import vorez.mods.skins.impl.PlayerProfile;
-import vorez.mods.skins.impl.fabric.ImageUtils;
-import vorez.mods.skins.impl.fabric.SkinUtils;
+import vorez.mods.skins.impl.Utils.ImageUtils;
+import vorez.mods.skins.impl.Utils.SkinUtils;
 import vorez.mods.skins.providers.*;
 import vorez.network.SmartInternetCheck;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -32,26 +35,29 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class FabricOfflineSkinsReloaded implements ClientModInitializer {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger LOG = LogUtils.getLogger();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Path CONFIG_PATH = Paths.get(".", "config", "offlineskins-reloaded.json");
-    private static final Map<String, Identifier> textures = new ConcurrentHashMap<>();
+    private static final Map<String, ResourceLocation> textures = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> skinAppearanceDelayUntil = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> capeAppearanceDelayUntil = new ConcurrentHashMap<>();
+
 
     public static boolean PLAYERHEADS = true;
 
     private static volatile ConfigOptions lastLoadedConfig = new ConfigOptions().defaultOptions();
 
-    private static Identifier generateRandomLocation() {
-        return Identifier.fromNamespaceAndPath("offlineskins-reloaded", String.format("textures/generated/%s", UUID.randomUUID()));
+    private static ResourceLocation generateRandomLocation() {
+        return ResourceLocation.fromNamespaceAndPath("offlineskins-reloaded", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     private static String textureKey(ByteBuffer data) {
@@ -69,7 +75,11 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         }
     }
 
-    public static Identifier getLocationSkin(GameProfile profile) {
+    public static ResourceLocation getLocationSkin(GameProfile profile) {
+        if (isSkinAppearanceDelayed(profile)) {
+            return null;
+        }
+
         ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
         if (skin != null && skin.isDataReady()) {
             ByteBuffer data = skin.getData();
@@ -79,7 +89,11 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         }
         return null;
     }
-    public static Identifier getLocationCape(GameProfile profile) {
+    public static ResourceLocation getLocationCape(GameProfile profile) {
+        if (isCapeAppearanceDelayed(profile)) {
+            return null;
+        }
+
         ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(profile));
         if (skin != null && skin.isDataReady()) {
             ByteBuffer data = skin.getData();
@@ -90,7 +104,11 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         return null;
     }
 
-    public static Identifier getUnofficialLocationSkin(GameProfile profile) {
+    public static ResourceLocation getUnofficialLocationSkin(GameProfile profile) {
+        if (isSkinAppearanceDelayed(profile)) {
+            return null;
+        }
+
         ISkin skin = SkinProviderAPI.SKIN.getUnofficialSkin(PlayerProfile.wrapGameProfile(profile));
         if (skin != null && skin.isDataReady()) {
             ByteBuffer data = skin.getData();
@@ -101,8 +119,82 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         return null;
     }
 
-    private static Identifier registerTexture(ByteBuffer data, ISkin skin, String key) throws IOException {
-        Identifier location = generateRandomLocation();
+    private static void delaySkinAppearance(GameProfile profile) {
+        int delay = lastLoadedConfig.appearanceDelay;
+
+        if (delay <= 0) {
+            skinAppearanceDelayUntil.remove(profile.getId());
+            return;
+        }
+
+        skinAppearanceDelayUntil.put(
+                profile.getId(),
+                System.currentTimeMillis() + delay
+        );
+    }
+
+    private static void delayCapeAppearance(GameProfile profile) {
+        int delay = lastLoadedConfig.appearanceDelay;
+
+        if (delay <= 0) {
+            capeAppearanceDelayUntil.remove(profile.getId());
+            return;
+        }
+
+        capeAppearanceDelayUntil.put(
+                profile.getId(),
+                System.currentTimeMillis() + delay
+        );
+    }
+
+    private static long smoothInitialization() {
+        if (!lastLoadedConfig.smoothInitialization) {
+            return 0;
+        }
+
+        return (long) ((Math.random()) * 1000);
+    }
+
+    private static void runSmoothInitialization(long delay, Runnable action) {
+        if (delay <= 0) {
+            action.run();
+            return;
+        }
+
+        CompletableFuture.delayedExecutor(delay, TimeUnit.MILLISECONDS)
+                .execute(() -> Minecraft.getInstance().execute(action));
+    }
+
+    private static boolean isSkinAppearanceDelayed(GameProfile profile) {
+        Long until = skinAppearanceDelayUntil.get(profile.getId());
+
+        if (until == null)
+            return false;
+
+        if (System.currentTimeMillis() >= until) {
+            skinAppearanceDelayUntil.remove(profile.getId(), until);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean isCapeAppearanceDelayed(GameProfile profile) {
+        Long until = capeAppearanceDelayUntil.get(profile.getId());
+
+        if (until == null)
+            return false;
+
+        if (System.currentTimeMillis() >= until) {
+            capeAppearanceDelayUntil.remove(profile.getId(), until);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static ResourceLocation registerTexture(ByteBuffer data, ISkin skin, String key) throws IOException {
+        ResourceLocation location = generateRandomLocation();
         ByteBuffer readBuffer = data.asReadOnlyBuffer();
         readBuffer.rewind();
         DynamicTexture texture = new DynamicTexture(location::toString, NativeImage.read(readBuffer));
@@ -124,13 +216,13 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         return location;
     }
 
-    private static Identifier getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
+    private static ResourceLocation getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
         String key = textureKey(data);
         if (key == null) {
             return null;
         }
 
-        Identifier existing = textures.get(key);
+        ResourceLocation existing = textures.get(key);
         if (existing != null) {
             return existing;
         }
@@ -141,7 +233,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         }
 
         CountDownLatch latch = new CountDownLatch(1);
-        AtomicReference<Identifier> result = new AtomicReference<>();
+        AtomicReference<ResourceLocation> result = new AtomicReference<>();
         AtomicReference<IOException> error = new AtomicReference<>();
         client.execute(() -> {
             try {
@@ -165,7 +257,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         return result.get();
     }
 
-    private static Identifier getOrCreateTextureNullable(ByteBuffer data, ISkin skin) {
+    private static ResourceLocation getOrCreateTextureNullable(ByteBuffer data, ISkin skin) {
         try {
             return getOrCreateTexture(data, skin);
         } catch (IOException e) {
@@ -174,7 +266,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     }
 
     public static String getSkinType(GameProfile profile) {
-        Identifier location = getLocationSkin(profile);
+        ResourceLocation location = getLocationSkin(profile);
         if (location != null) {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
             if (skin != null && skin.isDataReady()) {
@@ -206,8 +298,12 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
                 GSON.toJson(config, writer);
             }
         } catch (Exception e) {
-            LOGGER.error("[OfflineSkins-Reloaded] Failed to write config file.", e);
+            LOG.error("[OfflineSkins-Reloaded] Failed to write config file.", e);
         }
+    }
+
+    public static ConfigOptions getRuntimeConfig() {
+        return lastLoadedConfig;
     }
 
     public static synchronized void reloadRuntime() {
@@ -227,24 +323,40 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
             throw new RuntimeException(e);
         }
 
-        if (!CONFIG_PATH.toFile().exists()) {
-            saveConfigFile(new ConfigOptions().defaultOptions());
+        if (!Files.exists(CONFIG_PATH)) {
+            ConfigOptions config = new ConfigOptions().defaultOptions();
+            saveConfigFile(config);
+            return config;
         }
 
         try {
             String json = Files.readString(CONFIG_PATH, StandardCharsets.UTF_8);
+            JsonObject originalJson = JsonParser.parseString(json).getAsJsonObject();
 
-            ConfigOptions config = GSON.fromJson(json, ConfigOptions.class);
+            ConfigOptions config = GSON.fromJson(originalJson, ConfigOptions.class);
 
             if (config == null) {
                 config = new ConfigOptions().defaultOptions();
             }
 
-            config.validate();
+            config.hints();
+
+            boolean changed = config.validate();
+
+            JsonObject normalizedJson = GSON.toJsonTree(config).getAsJsonObject();
+
+            if (changed || !originalJson.equals(normalizedJson)) {
+                Files.writeString(
+                        CONFIG_PATH,
+                        GSON.toJson(normalizedJson),
+                        StandardCharsets.UTF_8
+                );
+            }
+
             return config;
 
         } catch (Exception e) {
-            LOGGER.error("[OfflineSkins-Reloaded] Failed to read config file.", e);
+            LOG.error("[OfflineSkins-Reloaded] Failed to read config file.", e);
             return new ConfigOptions().defaultOptions();
         }
     }
@@ -253,6 +365,9 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         if (config == null) {
             config = new ConfigOptions().defaultOptions();
         }
+
+        CachedSkinProvider.setRememberSkin(config.rememberSkin);
+        CachedCapeProvider.setRememberCape(config.rememberCape);
 
         SkinProviderAPI.SKIN.clearProviders();
         SkinProviderAPI.CAPE.clearProviders();
@@ -276,7 +391,8 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
             SkinProviderAPI.SKIN.registerProvider(
                     new CustomServerSkinProvider()
                             .setHost(config.linkCustomServerSkin)
-                            .setAllowHd(config.allowHdSkins)
+                            .setAllowHd(config.allowHDPlayers)
+                            .setMaxHDResolution(config.maxHDResolution)
                             .withFilter(ImageUtils::legacySkinFilter)
             );
         }
@@ -297,7 +413,8 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
             SkinProviderAPI.CAPE.registerProvider(
                     new CustomServerCapeProvider()
                             .setHost(config.linkCustomServerCape)
-                            .setAllowHd(config.allowHdSkins)
+                            .setAllowHd(config.allowHDPlayers)
+                            .setMaxHDResolution(config.maxHDResolution)
                             .withFilter(ImageUtils::legacyCapeFilter)
             );
         }
@@ -315,13 +432,34 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     public static void recacheSkins() {
         Minecraft client = Minecraft.getInstance();
 
-        SkinUtils.clearPlayersTextureSuppliers();
-
         if (client.level != null) {
-            for (Player player : client.level.players()) {
-                PlayerProfile profile = PlayerProfile.wrapGameProfile(player.getGameProfile());
+            boolean smooth = lastLoadedConfig.smoothInitialization;
 
-                SkinProviderAPI.SKIN.refresh(profile);
+            if (!smooth) {
+                SkinUtils.clearPlayersTextureSuppliers();
+
+                for (Player player : client.level.players()) {
+                    GameProfile gameProfile = player.getGameProfile();
+                    PlayerProfile profile = PlayerProfile.wrapGameProfile(gameProfile);
+
+                    delaySkinAppearance(gameProfile);
+                    SkinProviderAPI.SKIN.recache(profile);
+                }
+
+                return;
+            }
+
+            for (Player player : client.level.players()) {
+                GameProfile gameProfile = player.getGameProfile();
+                PlayerProfile profile = PlayerProfile.wrapGameProfile(gameProfile);
+
+                long delay = smoothInitialization();
+
+                runSmoothInitialization(delay, () -> {
+                    SkinUtils.clearPlayerTextureSuppliers(profile.getPlayerName());
+                    delaySkinAppearance(gameProfile);
+                    SkinProviderAPI.SKIN.recache(profile);
+                });
             }
         }
     }
@@ -329,23 +467,50 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     public static void recacheSkin() {
         Minecraft client = Minecraft.getInstance();
         if (client.player != null) {
-            PlayerProfile profile = PlayerProfile.wrapGameProfile(client.player.getGameProfile());
+            GameProfile gameProfile = client.player.getGameProfile();
+            PlayerProfile profile = PlayerProfile.wrapGameProfile(gameProfile);
+
             SkinUtils.clearPlayerTextureSuppliers(profile.getPlayerName());
 
-            SkinProviderAPI.SKIN.refresh(profile);
+            delaySkinAppearance(gameProfile);
+
+            CachedSkinProvider.refreshSelectedSkin(profile.getPlayerName());
+
+            SkinProviderAPI.SKIN.recache(profile);
         }
     }
 
     public static void recacheCapes() {
         Minecraft client = Minecraft.getInstance();
 
-        SkinUtils.clearPlayersTextureSuppliers();
-
         if (client.level != null) {
-            for (Player player : client.level.players()) {
-                PlayerProfile profile = PlayerProfile.wrapGameProfile(player.getGameProfile());
+            boolean smooth = lastLoadedConfig.smoothInitialization;
 
-                SkinProviderAPI.CAPE.refresh(profile);
+            if (!smooth) {
+                SkinUtils.clearPlayersTextureSuppliers();
+
+                for (Player player : client.level.players()) {
+                    GameProfile gameProfile = player.getGameProfile();
+                    PlayerProfile profile = PlayerProfile.wrapGameProfile(gameProfile);
+
+                    delayCapeAppearance(gameProfile);
+                    SkinProviderAPI.CAPE.recache(profile);
+                }
+
+                return;
+            }
+
+            for (Player player : client.level.players()) {
+                GameProfile gameProfile = player.getGameProfile();
+                PlayerProfile profile = PlayerProfile.wrapGameProfile(gameProfile);
+
+                long delay = smoothInitialization();
+
+                runSmoothInitialization(delay, () -> {
+                    SkinUtils.clearPlayerTextureSuppliers(profile.getPlayerName());
+                    delayCapeAppearance(gameProfile);
+                    SkinProviderAPI.CAPE.recache(profile);
+                });
             }
         }
     }
@@ -353,10 +518,16 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     public static void recacheCape() {
         Minecraft client = Minecraft.getInstance();
         if (client.player != null) {
-            PlayerProfile profile = PlayerProfile.wrapGameProfile(client.player.getGameProfile());
+            GameProfile gameProfile = client.player.getGameProfile();
+            PlayerProfile profile = PlayerProfile.wrapGameProfile(gameProfile);
+
             SkinUtils.clearPlayerTextureSuppliers(profile.getPlayerName());
 
-            SkinProviderAPI.CAPE.refresh(profile);
+            delayCapeAppearance(gameProfile);
+
+            CachedCapeProvider.refreshSelectedCape(profile.getPlayerName());
+
+            SkinProviderAPI.CAPE.recache(profile);
         }
     }
 

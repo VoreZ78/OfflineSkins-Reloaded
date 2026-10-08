@@ -1,169 +1,362 @@
-# OfflineSkins-Reloaded-26.2
+<div align="center">
 
-OfflineSkins Reloaded for Minecraft 26.2.
+# OfflineSkins Reloaded
 
-A client-side Fabric mod that allows player skins and capes to be loaded from the local cache, making them available even when Mojang services are unavailable or when playing in offline mode.
+**Offline skins & capes for Minecraft**
 
-OfflineSkins Reloaded is a heavily reworked and optimized version of the original OfflineSkins project, with a redesigned core, improved networking, configuration system, server validation and additional client-side features.
+Fabric · 1.21.6 — 1.21.8
 
-## Features
+<br>
 
-- 🎨 Offline skin support
-- 🦸 Offline cape support
-- 📁 Local texture cache loading
-- ⚡ Optimized networking and lightweight client-side operation
-- 🧩 Fabric 26.2 support
-- 🌍 17 languages supported
-- ⚙️ YACL configuration menu
-- 🔍 Server and URL validation
-- 🖥️ Configuration button in the Title Screen
-- ⏸️ Configuration button in the Pause Screen
-- ⌨️ `U` keybind for quickly opening the configuration menu
-- 💬 `/offlineskins menu` command
-- ℹ️ `/offlineskins version` command
-- 🖼️ HD skin and cape support
-- 🚫 HD texture restrictions with configurable `allowHD` support
-- ❗ Replacement textures for HD skins and capes when HD textures are not allowed
-- 🔄 Improved and modernized skin loading architecture
+[Modrinth](https://modrinth.com/mod/offlineskins-reloaded) ·
+[Discord](https://discord.com/invite/KgscJEE5B) ·
+[GitHub](https://github.com/VoreZ78/OfflineSkins-Reloaded)
 
-## New Features
+</div>
 
-- 🗄️ Added FSCS technology or Fast Skin and Cape Selection
-- 🔄 Added FSCRS technology or Fast Skin and Cape Recache System
-- 🖼️ Added LSC-F technology or Legacy Skin and Cape Filter
-- ℹ️ Added more tabs to the OfflineSkins Reloaded menu
-- ⚡ Code cleanup and bug fixes
-- ⚡ Improved optimization and network performance
-- ❓ Added an FAQ menu for common questions
+---
 
-## Configuration
+OfflineSkins Reloaded is a client-side Fabric mod that keeps player skins and capes available even when Mojang services are unavailable or when playing offline.
 
-OfflineSkins Reloaded provides a YACL-based configuration menu.
+**Heavily reworked and optimized from the original OfflineSkins project.**
 
-The configuration can be opened through:
+---
 
-- The button in the Minecraft Title Screen
-- The button in the Pause Screen
-- The `U` key
-- `/offlineskins menu`
 
-## Legacy Filters
+## 1.2.0
 
-- Remaps old 64x32 skin textures to modern 64x64 without quality loss
+> **A major rewrite focused on performance, configuration, caching, reliability and life better.**
 
-- Remaps old 22x17 cape textures to modern 64x32 without quality loss
+### What's new
 
-## HD Textures
+|     | Feature                   | Description                                                                |
+| --- | ------------------------- | -------------------------------------------------------------------------- |
+| 💾  | **Remember Skin / Cape**  | Preserve selected cached skins and capes between sessions                  |
+| 🔁  | **Reset Skin / Cape**     | Quickly reset remembered skin or cape selections                           |
+| ⚡   | **FSCS**                  | Fast Skin and Cape Selection                                               |
+| 🔄  | **FSCRS**                 | Fast Skin and Cape Recache System                                          |
+| 👤  | **Smooth Recache**        | Recache players individually instead of forcing unnecessary global updates |
+| ⏱️  | **Appearance Delay**      | Configurable delay for smoother texture appearance                         |
+| 📐  | **Maximum HD Resolution** | Configure the maximum supported HD texture resolution                      |
+| 🐞  | **Debug Options**         | Additional tools for debugging and troubleshooting                         |
+| ❓   | **FAQ**                   | Integrated FAQ menu for common questions and problems                      |
+| ⚡   | **Network Optimization**  | Reduced unnecessary network traffic and improved validation flow           |
+| 🖼️ | **LSC-F**                 | Legacy Skin and Cape Filter for older texture formats                      |
+
+---
+
+# REWRITTEN FROM SCRATCH
+
+### `URLConnectionValidator`
+
+The connection validation system was completely rewritten from scratch.
+
+The new implementation provides redesigned connection checks, response handling and validation logic for skin and cape sources.
+
+### `YaclSettings`
+
+The YACL settings system was completely rewritten from scratch.
+
+The configuration structure was redesigned to provide a cleaner and more maintainable settings architecture.
+
+---
+
+# IMPROVED AND FIXED
+
+### `URLConnectionValidation`
+
+Improved connection validation, response handling and error detection for external skin and cape sources.
+
+### HD Skin Network Traffic
+
+Reduced unnecessary network traffic when HD skins are rejected during validation or fail to pass the configured texture filters.
+
+### FAQ Menu
+
+Improved and fixed FAQ menu behavior, navigation and presentation.
+
+---
+
+# VOREZCORE FEATURES
+
+### 🎨 Skins & Capes
+
+* Offline skin support
+* Offline cape support
+* Local texture cache loading
+* HD skin and cape support
+* Replacement textures for disallowed HD textures
+* Modernized skin loading architecture
+
+### ⚡ Performance
+
+* Optimized networking
+* Lightweight client-side operation
+* Fast cached texture selection
+* Fast recaching
+* Individual player recaching
+* Reduced unnecessary network requests
+
+### ⚙️ Configuration
+
+Powered by **YACL**.
+
+The configuration menu includes:
+
+* Cached skin and cape settings
+* Skin and cape providers
+* Custom server configuration
+* HD texture settings
+* Maximum HD resolution
+* Appearance Delay
+* Remember Skin / Cape
+* Reset Skin / Cape
+* Debug Options
+* FAQ
+
+---
+
+# OPENING THE CONFIGURATION
+
+The OfflineSkins Reloaded menu can be opened using any of these methods:
+
+| Method           | Action               |
+| ---------------- | -------------------- |
+| 🖥️ Title Screen | Configuration button |
+| ⏸️ Pause Screen  | Configuration button |
+| ⌨️ Keybind       | `U` by default       |
+| 💬 Command       | `/offlineskins menu` |
+
+The keybind can be changed through Minecraft's **Controls** menu.
+
+---
+
+# CACHE SYSTEM
+
+OfflineSkins Reloaded uses a local texture cache:
+
+```text
+cachedImages/
+├── skins/
+└── capes/
+```
+
+### Skins
+
+Place skin textures inside:
+
+```text
+cachedImages/skins/
+```
+
+Example:
+
+```text
+cachedImages/skins/Steve.png
+```
+
+### Capes
+
+Place cape textures inside:
+
+```text
+cachedImages/capes/
+```
+
+Example:
+
+```text
+cachedImages/capes/Steve.png
+```
+
+The filename must match the player's username.
+
+---
+
+# HD TEXTURES
 
 OfflineSkins Reloaded supports high-resolution skins and capes.
 
 HD textures can be enabled through the `allowHD` setting for supported servers.
 
-When HD textures are not allowed for players on a server, the mod can replace oversized skins and capes with special fallback textures:
+The maximum allowed resolution can be configured through **Maximum HD Resolution**.
 
-- `SkinHDNotAllowed.png`
-- `CapeHDNotAllowed.png`
+When HD textures are not allowed, oversized textures can be replaced with:
 
-This helps optimize network traffic from players using high-resolution skins or capes when HD textures are not permitted.
-
-The local cached texture system can still contain textures of arbitrary supported resolutions.
-
-## Cached Textures
-
-The mod uses the local cache directory:
-
-## Custom Server Skin and Cape Providers
-
-The mod also supports custom skin and cape providers, allowing skins and capes from external servers to be loaded into your game.
-
-### Smart Internet Check
-
-**Smart Internet Check** automatically detects when your internet connection is unavailable and prevents unnecessary network requests.
-
-Your local skins and capes from `cachedImages` are never affected by this check and continue to work normally. Cached skins and capes can also be enabled or disabled independently in the configuration.
-
-## ⚠️ Content Warning
-
-OfflineSkins Reloaded may load skins and capes from third-party services.
-Third-party services may contain user-created content that can be provocative, offensive, disturbing or otherwise inappropriate. This content is not controlled, moderated or endorsed by the OfflineSkins Reloaded project.
-Use third-party skin and cape sources at your own discretion.
 ```text
-cachedimages/
-├── skins/
-└── capes/
-Skins
+SkinHDNotAllowed.png
+CapeHDNotAllowed.png
+```
 
-Place player skin textures inside:
+This helps avoid unnecessary network traffic from high-resolution textures that cannot be used.
 
-cachedimages/skins/
+The local cache can contain textures using supported resolutions.
 
-Example:
+---
 
-cachedimages/skins/Steve.png
-Capes
+# LEGACY FILTERS
 
-Place cape textures inside:
+OfflineSkins Reloaded includes **LSC-F — Legacy Skin and Cape Filter**.
 
-cachedimages/capes/
+| Legacy format | Modern format |
+| ------------- | ------------- |
+| `64x32` skin  | `64x64` skin  |
+| `22x17` cape  | `64x32` cape  |
 
-Example:
+The textures are remapped without quality loss.
 
-cachedimages/capes/Steve.png
+---
 
-The filename must match the player's username.
+# CUSTOM PROVIDERS
 
-Commands
-Open configuration
-/offlineskins menu
+OfflineSkins Reloaded supports custom external skin and cape providers.
 
-Opens the OfflineSkins Reloaded configuration menu.
+Custom servers can be configured directly from the YACL configuration menu, including provider-specific HD texture permissions and server settings.
 
-Show version
-/offlineskins version
+---
 
-Displays the currently installed OfflineSkins Reloaded version.
+# SMART INTERNET CHECK
 
-Keybinds
+**Smart Internet Check** detects when the internet connection is unavailable and prevents unnecessary network requests.
 
-By default:
+Local textures from `cachedimages` are not affected.
 
-U
+Cached skins and capes can also be enabled or disabled independently.
 
-opens the OfflineSkins Reloaded configuration menu.
+---
 
-The keybind can be changed through Minecraft's Controls menu.
+# FAST SKIN & CAPE SYSTEM
 
-Server and URL Validation
+### FSCS
+
+**Fast Skin and Cape Selection** improves the process of selecting cached player textures and avoids unnecessary work during texture changes.
+
+### FSCRS
+
+**Fast Skin and Cape Recache System** provides smoother texture recaching by updating players individually.
+
+### Appearance Delay
+
+**Appearance Delay** controls how quickly newly loaded textures become visible, helping make texture updates feel smoother.
+
+---
+
+# VALIDATION
 
 OfflineSkins Reloaded includes validation for custom skin and cape sources.
 
-This helps prevent invalid or unsupported image data from being loaded as player skins or capes.
+The validation system helps handle:
 
-Languages
+* Unavailable servers
+* Unstable connections
+* Provider responses
 
-OfflineSkins Reloaded supports 17 languages.
+This reduces the chance of unsupported image data being applied as player skins or capes.
 
-The localization files are included with the mod and cover the configuration menu and its options.
+---
 
-Credits
-Original Project
+# COMMANDS
 
-Author: zlainsama
+### Open configuration
 
-Original Repository:
+```text
+/offlineskins menu
+```
+
+Opens the OfflineSkins Reloaded configuration menu.
+
+### Show version
+
+```text
+/offlineskins version
+```
+
+Displays the installed OfflineSkins Reloaded version.
+
+---
+
+# DEBUG OPTIONS
+
+A dedicated **Debug Options** section is available for advanced troubleshooting.
+
+It can be used to diagnose provider, loading, validation and other client-side issues.
+
+---
+
+# FAQ
+
+OfflineSkins Reloaded includes an integrated FAQ menu covering common questions and problems related to skins, capes, caching, providers and configuration.
+
+---
+
+# LANGUAGES
+
+**17 languages** are supported.
+
+Localization files cover the configuration menu and its available options.
+
+|     | Language |
+| --- | -------- |
+| 🌍  | **English** |
+| 🌍  | **Russian** |
+| 🌍  | **Spanish** |
+| 🌍  | **German** |
+| 🌍  | **French** |
+| 🌍  | **Italian** |
+| 🌍  | **Japanese** |
+| 🌍  | **Korean** |
+| 🌍  | **Polish** |
+| 🌍  | **Portuguese (Brazil)** |
+| 🌍  | **Simplified Chinese** |
+| 🌍  | **Ukrainian** |
+| 🌍  | **Azerbaijani** |
+| 🌍  | **Turkish** |
+| 🌍  | **Czech** |
+| 🌍  | **Dutch** |
+| 🌍  | **Swedish** |
+
+<sub>⚠️ The translations are not 100% correct.</sub>
+
+---
+
+# ORIGINAL PROJECT
+
+OfflineSkins Reloaded is based on the original OfflineSkins project by **zlainsama**.
+
+**Original repository**
+
 https://github.com/zlainsama/OfflineSkins
 
-Minecraft Fabric Port / OfflineSkins Reloaded
+---
 
-Author: VoreZ
+# OFFLINESKINS RELOADED
 
-Repository:
-https://github.com/VoreZ78/offlineskins
+**Author:** VoreZ
 
-OfflineSkins Reloaded contains substantial changes and improvements over the original project, including a reworked core, optimized networking, a new configuration system, server validation, client UI integration, HD texture handling and additional commands and keybindings.
+**Repository**
 
-License
+https://github.com/VoreZ78/OfflineSkins-Reloaded
 
-This project is licensed under the MIT License.
+---
 
-See the LICENSE file for details.
+# CONTENT WARNING
+
+> ⚠️ OfflineSkins Reloaded may load skins and capes from third-party services.
+>
+> Third-party services may contain user-created content that can be provocative, offensive, disturbing or otherwise inappropriate.
+>
+> This content is **not controlled, moderated or endorsed** by the OfflineSkins Reloaded project.
+>
+> Use third-party skin and cape sources at your own discretion.
+
+---
+
+<div align="center">
+
+### OfflineSkins Reloaded 1.2.0
+
+**Offline textures. Better caching. Better networking. Better life**
+
+Made by **VoreZ**
+
+</div>

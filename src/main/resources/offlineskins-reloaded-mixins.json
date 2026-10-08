@@ -1,11 +1,11 @@
 {
   "required": true,
   "package": "vorez.mods.skins.init.fabric.mixins",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "client": [
     "PlayerListEntryMixin",
-    "SkullBlockItemRendererMixin",
     "SkullBlockRendererMixin",
+    "SkullBlockItemRendererMixin",
     "PlayerListHudMixin",
     "TitleScreenMixin",
     "PauseScreenMixin"
