@@ -8,7 +8,7 @@ import com.mojang.authlib.GameProfile;
 import vorez.lib.Retries;
 import vorez.lib.SharedPool;
 import vorez.lib.SimpleDownloader;
-import vorez.mods.skins.impl.fabric.MinecraftUtils;
+import vorez.mods.skins.impl.Utils.MinecraftUtils;
 import vorez.network.SmartInternetCheck;
 
 import java.io.ByteArrayOutputStream;
@@ -59,7 +59,7 @@ public class Shared {
         }, defaultContents, consumer);
     }
 
-    public static CompletableFuture<Optional<byte[]>> downloadSkin(String resource, Executor executor) {
+    public static CompletableFuture<Optional<byte[]>> downloadImage(String resource, Executor executor) {
         if (SmartInternetCheck.shouldBlockRequests())
             return CompletableFuture.completedFuture(Optional.empty());
 

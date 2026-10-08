@@ -6,19 +6,22 @@ import vorez.mods.skins.api.interfaces.ISkin;
 import vorez.mods.skins.api.interfaces.ISkinProvider;
 import vorez.mods.skins.impl.Shared;
 import vorez.mods.skins.impl.SkinData;
-import vorez.mods.skins.impl.fabric.ImageUtils;
+import vorez.mods.skins.impl.Utils.ImageUtils;
+import vorez.mods.skins.providers.latestCached.SelectedImageStore;
 
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class CachedSkinProvider implements ISkinProvider {
     private final File _dirN;
     private final File _dirU;
-    private static final Map<String, Path> selectedSkins = new ConcurrentHashMap<>();
+    private static final SelectedImageStore selected =
+            new SelectedImageStore(Path.of(".", "cachedImages", "skins"));
+    private static final Set<String> ignoredPlayers = ConcurrentHashMap.newKeySet();
     private Function<ByteBuffer, ByteBuffer> _filter;
 
     public CachedSkinProvider(Path workDir) {
@@ -37,15 +40,20 @@ public class CachedSkinProvider implements ISkinProvider {
         if (_filter != null) {
             skin.setSkinFilter(_filter);
         }
+
         String playerName = profile.getPlayerName();
-        String playerUUID= String.valueOf(profile.getPlayerUUID());
+        String playerUUID = String.valueOf(profile.getPlayerUUID());
+
+        if (ignoredPlayers.contains(playerName)) {
+            return skin;
+        }
 
         SharedPool.execute(() -> {
             byte[] data = null;
-            Path selected = getSelectedSkin(playerName);
+            Path selectedPath = getSelectedSkin(playerName);
 
-            if (selected != null)
-                data = readFile(selected);
+            if (selectedPath != null)
+                data = readFile(selectedPath);
 
             if (data == null && !Shared.isOfflinePlayer(profile.getPlayerUUID(), playerName))
                 data = readFile(_dirU, "%s.png", playerUUID.replaceAll("-", ""));
@@ -56,6 +64,7 @@ public class CachedSkinProvider implements ISkinProvider {
             if (data != null)
                 skin.put(data, ImageUtils.judgeSkinType(data));
         });
+
         return skin;
     }
 
@@ -74,23 +83,43 @@ public class CachedSkinProvider implements ISkinProvider {
     }
 
     public static void setSelectedSkin(String playerName, Path skinPath) {
-        selectedSkins.put(playerName, skinPath);
+        ignoredPlayers.remove(playerName);
+        selected.setSelected(playerName, skinPath);
+    }
+
+    public static void setRememberSkin(boolean rememberSkin) {
+        selected.setRemember(rememberSkin);
+    }
+
+    public static void refreshSelectedSkin(String playerName) {
+        selected.refreshSelected(playerName);
+    }
+
+    public static void resetSkin(String playerName) {
+        selected.clear();
+        ignoredPlayers.add(playerName);
     }
 
     public static Path getSelectedSkin(String playerName) {
-        Path path = selectedSkins.get(playerName);
-        if (path != null)
-            return path;
-        if (!Shared.isBlank(playerName)) {
-            Path defaultSkin = Path.of(".", "cachedImages", "skins", playerName + ".png");
-            if (defaultSkin.toFile().isFile())
-                return defaultSkin;
+        if (ignoredPlayers.contains(playerName)) {
+            return null;
         }
-        return null;
+
+        return selected.getSelected(playerName);
     }
+
+    public static String getSelectedSkinSource() {
+        return selected.getSelectedSource();
+    }
+
+    public static boolean isSelectedSkin(String source) {
+        return selected.isSelected(source);
+    }
+
     private byte[] readFile(File dir, String filename, Object... args) {
         return readFile(dir, String.format(filename, args));
     }
+
     public CachedSkinProvider withFilter(Function<ByteBuffer, ByteBuffer> filter) {
         _filter = filter;
         return this;

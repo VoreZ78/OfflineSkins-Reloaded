@@ -18,7 +18,10 @@ public interface ISkinProviderService extends ISkinProvider {
      *
      * @param profile the profile to refresh.
      */
-    void refresh(IPlayerProfile profile);
 
     ISkin getUnofficialSkin(IPlayerProfile profile);
+
+    void clearFirst(IPlayerProfile profile);
+
+    void recache(IPlayerProfile profile);
 }

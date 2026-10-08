@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class PlayerProfile implements IPlayerProfile {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOG = LogUtils.getLogger();
 
     private static final PlayerProfile DUMMY = new PlayerProfile(Shared.DUMMY, stableKey(Shared.DUMMY));
 
@@ -45,10 +45,10 @@ public class PlayerProfile implements IPlayerProfile {
                             PlayerProfile profile = new PlayerProfile(key, stableKey(key));
 
                             if (!Shared.isBlank(keyName)) {
-                                UUID resolvedUuid = mojangUuidCache.get(keyName.toLowerCase(Locale.ROOT));
+                                UUID resolvedUuid = mojangUUIDCache.get(keyName.toLowerCase(Locale.ROOT));
 
                                 if (resolvedUuid != null) {
-                                    profile.mojangUuid = resolvedUuid;
+                                    profile.mojangUUID = resolvedUuid;
                                 }
                             }
 
@@ -56,9 +56,9 @@ public class PlayerProfile implements IPlayerProfile {
                         }
                     });
 
-    private static final ConcurrentMap<String, UUID> mojangUuidCache = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, UUID> mojangUUIDCache = new ConcurrentHashMap<>();
 
-    private static final ConcurrentMap<String, Boolean> mojangUuidAttempts = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Boolean> mojangUUIDAttempts = new ConcurrentHashMap<>();
 
     private final Collection<Consumer<IPlayerProfile>> listeners = new CopyOnWriteArrayList<>();
 
@@ -68,7 +68,7 @@ public class PlayerProfile implements IPlayerProfile {
 
     private final WeakReference<GameProfile> profile;
 
-    private volatile UUID mojangUuid;
+    private volatile UUID mojangUUID;
 
     private PlayerProfile(GameProfile profile, String stableIdentity) {
         if (profile == null) {
@@ -95,7 +95,7 @@ public class PlayerProfile implements IPlayerProfile {
         String name = GameProfileCompat.name(original);
         UUID currentUuid = GameProfileCompat.id(original);
 
-        if (!needsMojangUuid(currentUuid, name)) {
+        if (!setMojangUUID(currentUuid, name)) {
             return;
         }
 
@@ -105,14 +105,14 @@ public class PlayerProfile implements IPlayerProfile {
 
         String attemptKey = name.toLowerCase(Locale.ROOT);
 
-        UUID cachedUuid = mojangUuidCache.get(attemptKey);
+        UUID cachedUuid = mojangUUIDCache.get(attemptKey);
 
         if (cachedUuid != null) {
-            localProfile.mojangUuid = cachedUuid;
+            localProfile.mojangUUID = cachedUuid;
             return;
         }
 
-        if (mojangUuidAttempts.putIfAbsent(attemptKey, Boolean.TRUE) != null) {
+        if (mojangUUIDAttempts.putIfAbsent(attemptKey, Boolean.TRUE) != null) {
             return;
         }
 
@@ -121,7 +121,7 @@ public class PlayerProfile implements IPlayerProfile {
                 new FutureCallback<>() {
                     @Override
                     public void onFailure(Throwable throwable) {
-                        LOGGER.error("Failed to load profile for {}", name, throwable);
+                        LOG.error("[OfflineSkins-Reloaded] Failed to load profile for {}", name, throwable);
                     }
 
                     @Override
@@ -135,8 +135,8 @@ public class PlayerProfile implements IPlayerProfile {
                             return;
                         }
 
-                        mojangUuidCache.put(attemptKey, resolvedUuid);
-                        localProfile.mojangUuid = resolvedUuid;
+                        mojangUUIDCache.put(attemptKey, resolvedUuid);
+                        localProfile.mojangUUID = resolvedUuid;
                     }
                 },
                 Runnable::run
@@ -144,7 +144,7 @@ public class PlayerProfile implements IPlayerProfile {
 
     }
 
-    private static boolean needsMojangUuid(UUID uuid, String name) {
+    private static boolean setMojangUUID(UUID uuid, String name) {
         if (Shared.isBlank(name)) {
             return false;
         }
@@ -184,9 +184,7 @@ public class PlayerProfile implements IPlayerProfile {
             return false;
         }
 
-        return stableIdentity.equals(
-                other.stableIdentity
-        );
+        return stableIdentity.equals(other.stableIdentity);
     }
 
     @Override
@@ -203,7 +201,7 @@ public class PlayerProfile implements IPlayerProfile {
 
     @Override
     public UUID getPlayerUUID() {
-        UUID resolved = mojangUuid;
+        UUID resolved = mojangUUID;
         if (resolved != null) {
             return resolved;
         }
@@ -216,7 +214,6 @@ public class PlayerProfile implements IPlayerProfile {
     public String getPlayerName() {
         GameProfile current = profile.get();
         return GameProfileCompat.name(Objects.requireNonNullElse(current, Shared.DUMMY));
-
     }
 
     @Override

@@ -1,6 +1,9 @@
 package vorez.mods.skins.api;
 
-import com.google.common.cache.*;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import vorez.lib.SharedPool;
@@ -98,15 +101,15 @@ public class SkinProviderAPI {
                                 skins.add(skin);
 
                                 if (provider instanceof vorez.mods.skins.providers.CachedSkinProvider
-                                        || provider instanceof vorez.mods.skins.providers.CustomServerSkinProvider) {
+                                        || provider instanceof vorez.mods.skins.providers.CustomServerSkinProvider
+                                        || provider instanceof  vorez.mods.skins.providers.CrafatarSkinProvider
+                                ) {
                                     unofficialSkins.add(skin);
                                 }
                             }
                         }
 
-                        return new SkinBundle()
-                                .set(skins)
-                                .setUnofficial(unofficialSkins);
+                        return new SkinBundle().set(skins).setUnofficial(unofficialSkins);
                     }
 
                     @Override
@@ -124,7 +127,8 @@ public class SkinProviderAPI {
                                 skins.add(skin);
 
                                 if (provider instanceof vorez.mods.skins.providers.CachedSkinProvider
-                                        || provider instanceof vorez.mods.skins.providers.CustomServerSkinProvider) {
+                                        || provider instanceof vorez.mods.skins.providers.CustomServerSkinProvider
+                                        || provider instanceof vorez.mods.skins.providers.CrafatarSkinProvider) {
                                     unofficialSkins.add(skin);
                                 }
                             }
@@ -195,13 +199,6 @@ public class SkinProviderAPI {
             }
 
             @Override
-            public void refresh(IPlayerProfile profile) {
-                if (profile != null && cache.getIfPresent(profile) != null) {
-                    cache.refresh(profile);
-                }
-            }
-
-            @Override
             public ISkin getSkin(IPlayerProfile profile) {
                 if (profile == null)
                     return DUMMY;
@@ -223,6 +220,43 @@ public class SkinProviderAPI {
                     return false;
 
                 return providers.add(provider);
+            }
+
+            @Override
+            public void clearFirst(IPlayerProfile profile) {
+                if (profile == null) {
+                    return;
+                }
+                SkinBundle bundle = cache.getIfPresent(profile);
+
+                if (bundle == null) {
+                    return;
+                }
+                AtomicReference<Object> state = reloading.getIfPresent(bundle);
+
+                if (state != null) {
+                    state.set(new Object());
+                }
+                bundle.clearFirst();
+            }
+
+            @Override
+            public void recache(IPlayerProfile profile) {
+                if (profile == null)
+                    return;
+
+                SkinBundle old = cache.getIfPresent(profile);
+
+                if (old != null) {
+                    AtomicReference<Object> state = reloading.getIfPresent(old);
+
+                    if (state != null)
+                        state.set(new Object());
+
+                    cache.invalidate(profile);
+                }
+
+                cache.getUnchecked(profile);
             }
 
         };

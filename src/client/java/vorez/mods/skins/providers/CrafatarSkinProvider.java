@@ -6,7 +6,7 @@ import vorez.mods.skins.api.interfaces.ISkin;
 import vorez.mods.skins.api.interfaces.ISkinProvider;
 import vorez.mods.skins.impl.Shared;
 import vorez.mods.skins.impl.SkinData;
-import vorez.mods.skins.impl.fabric.ImageUtils;
+import vorez.mods.skins.impl.Utils.ImageUtils;
 
 import java.nio.ByteBuffer;
 import java.util.function.Function;
@@ -23,7 +23,7 @@ public class CrafatarSkinProvider implements ISkinProvider {
 
         SharedPool.execute(() -> {
             if (!Shared.isOfflinePlayer(profile.getPlayerUUID(), profile.getPlayerName())) {
-                Shared.downloadSkin(
+                Shared.downloadImage(
                         String.format("https://crafatar.com/skins/%s", profile.getPlayerUUID()),
                         Runnable::run
                 ).thenAccept(optional -> optional.ifPresent(data -> {

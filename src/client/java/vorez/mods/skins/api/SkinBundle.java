@@ -35,6 +35,16 @@ public class SkinBundle implements ISkin {
             return Optional.empty();
         return skins.stream().filter(ISkin::isDataReady).findFirst();
     }
+    public void clearFirst() {
+        Collection<ISkin> skins = ref.get();
+
+        if (skins.isEmpty()) {
+            return;
+        }
+
+        ISkin first = skins.iterator().next();
+        first.onRemoval();
+    }
 
     @Override
     public ByteBuffer getData() {
