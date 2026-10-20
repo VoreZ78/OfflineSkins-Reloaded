@@ -26,6 +26,12 @@ public final class URLConnectionValidator {
     private static final String ELY_BY_SKIN_TEST_URL =
             "https://skinsystem.ely.by/skins/TestPlayerVoreZ.png";
 
+    private static final String T_LAUNCHER_SKIN_URL =
+            "https://auth.tlauncher.org/skin/fileservice/skins/skin_%auto%";
+
+    private static final String T_LAUNCHER_SKIN_TEST_URL =
+            "https://auth.tlauncher.org/skin/fileservice/skins/skin_GLvoreZ78.png";
+
     private URLConnectionValidator() {
     }
 
@@ -44,10 +50,16 @@ public final class URLConnectionValidator {
                 && ELY_BY_SKIN_URL.equals(url)
                 && ELY_BY_SKIN_URL.equals(config.linkCustomServerSkin);
 
+        boolean tLauncher = !cape
+                && T_LAUNCHER_SKIN_URL.equals(url)
+                && T_LAUNCHER_SKIN_URL.equals(config.linkCustomServerSkin);
+
         String checkedUrl;
 
         if (elyBy) {
             checkedUrl = ELY_BY_SKIN_TEST_URL;
+        } else if (tLauncher) {
+            checkedUrl = T_LAUNCHER_SKIN_TEST_URL;
         } else {
             checkedUrl = url.replace("%auto%", "agent");
         }

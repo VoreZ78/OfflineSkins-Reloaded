@@ -12,13 +12,10 @@ import java.nio.file.StandardCopyOption;
 
 public class SelectedImageStore {
 
-    private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting().create();
-
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final Path baseDirectory;
     private final Path selectedDirectory;
     private final Path metadataFile;
-
     private SelectedData data;
     private String sessionName;
     private Path sessionSource;
@@ -36,6 +33,14 @@ public class SelectedImageStore {
     private void createDirectories() {
         try {
             Files.createDirectories(baseDirectory);
+            Files.createDirectories(selectedDirectory);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to create selected directory: " + selectedDirectory, e);
+        }
+    }
+
+    private void ensureSelectedDirectory() {
+        try {
             Files.createDirectories(selectedDirectory);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to create selected directory: " + selectedDirectory, e);
@@ -88,6 +93,8 @@ public class SelectedImageStore {
     }
 
     public synchronized void setSelected(String playerName, Path source) {
+        ensureSelectedDirectory();
+
         if (playerName == null || playerName.isBlank()) {
             return;
         }
@@ -96,13 +103,8 @@ public class SelectedImageStore {
             return;
         }
 
-        Path normalizedBase = baseDirectory
-                .toAbsolutePath()
-                .normalize();
-
-        Path normalizedSource = source
-                .toAbsolutePath()
-                .normalize();
+        Path normalizedBase = baseDirectory.toAbsolutePath().normalize();
+        Path normalizedSource = source.toAbsolutePath().normalize();
 
         if (!normalizedSource.startsWith(normalizedBase)) {
             return;
@@ -118,10 +120,7 @@ public class SelectedImageStore {
             return;
         }
 
-        String relativeSource = normalizedBase
-                .relativize(normalizedSource)
-                .toString()
-                .replace('\\', '/');
+        String relativeSource = normalizedBase.relativize(normalizedSource).toString().replace('\\', '/');
 
         sessionName = null;
         sessionSource = null;
@@ -131,11 +130,7 @@ public class SelectedImageStore {
         Path target = selectedDirectory.resolve(playerName + ".png");
 
         try {
-            Files.copy(
-                    source,
-                    target,
-                    StandardCopyOption.REPLACE_EXISTING
-            );
+            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to copy selected image: " + source, e);
         }
@@ -147,6 +142,8 @@ public class SelectedImageStore {
     }
 
     public synchronized Path getSelected(String playerName) {
+        ensureSelectedDirectory();
+
         if (playerName == null || playerName.isBlank()) {
             return null;
         }
@@ -210,11 +207,7 @@ public class SelectedImageStore {
         Path renamed = selectedDirectory.resolve(playerName + ".png");
 
         try {
-            Files.move(
-                    selectedFile,
-                    renamed,
-                    StandardCopyOption.REPLACE_EXISTING
-            );
+            Files.move(selectedFile, renamed, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             return;
         }
@@ -225,9 +218,7 @@ public class SelectedImageStore {
 
     public synchronized String getSelectedSource() {
         if (sessionSource != null) {
-            return sessionSource
-                    .getFileName()
-                    .toString();
+            return sessionSource.getFileName().toString();
         }
 
         return data.source;
@@ -239,10 +230,7 @@ public class SelectedImageStore {
         }
 
         if (sessionSource != null) {
-            return sessionSource
-                    .getFileName()
-                    .toString()
-                    .equals(source);
+            return sessionSource.getFileName().toString().equals(source);
         }
 
         if (data.source == null) {
@@ -279,13 +267,9 @@ public class SelectedImageStore {
             return;
         }
 
-        Path source = baseDirectory.resolve(data.source)
-                .toAbsolutePath()
-                .normalize();
+        Path source = baseDirectory.resolve(data.source).toAbsolutePath().normalize();
 
-        Path base = baseDirectory
-                .toAbsolutePath()
-                .normalize();
+        Path base = baseDirectory.toAbsolutePath().normalize();
 
         if (!source.startsWith(base)) {
             return;

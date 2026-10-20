@@ -32,6 +32,12 @@ public final class URLValidator {
             return URLStatus.INVALID_URL;
         }
 
+        int autoIndex = url.indexOf("%auto%");
+
+        if (autoIndex != -1 && autoIndex + "%auto%".length() < url.length()) {
+            return URLStatus.AFTER_AUTO;
+        }
+
         String skinUrl = YaclSettings.getSkinUrl();
         String capeUrl = YaclSettings.getCapeUrl();
         CustomServersList preset = YaclSettings.getCurrentPreset();
@@ -145,13 +151,18 @@ public final class URLValidator {
 
             case DOMAIN_NOT_FOUND ->
                     Component.translatable("toast.offlineskins.domain-not-found");
+
+            case AFTER_AUTO ->
+                    Component.translatable("toast.offlineskins.after-auto");
         };
 
-        SystemToast.add(
-                client.gui.toastManager(),
-                SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
-                Component.literal(title),
-                message
+        client.getToastManager().addToast(
+                SystemToast.multiline(
+                        client,
+                        SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+                        Component.literal(title),
+                        message
+                )
         );
     }
 }

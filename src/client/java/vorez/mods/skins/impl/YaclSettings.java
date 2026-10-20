@@ -1,10 +1,10 @@
 package vorez.mods.skins.impl;
 
-import com.mojang.blaze3d.Blaze3D;
 import com.mojang.logging.LogUtils;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.*;
 import dev.isxander.yacl3.gui.controllers.LabelController;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
@@ -22,7 +22,6 @@ import vorez.network.URLStatus;
 import vorez.network.URLValidator;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -105,7 +104,7 @@ public final class YaclSettings {
 
         setCurrentPreset(options.customServersList);
 
-        if (options.customServersList.isElyBy()) {
+        if (options.customServersList.isElyBy() || options.customServersList.isTLauncher()) {
             options.linkCustomServerSkin = options.customServersList.getSkinUrl();
             options.linkCustomServerCape = options.customServersList.getCapeUrl();
         }
@@ -182,11 +181,13 @@ public final class YaclSettings {
                             1,
                             java.util.concurrent.TimeUnit.SECONDS
                     ).execute(() -> client.execute(() ->
-                            SystemToast.add(
-                                    client.gui.toastManager(),
-                                    SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
-                                    Component.translatable("offlineskins.reload.notification"),
-                                    Component.translatable("toast.offlineskins.reload.success")
+                            client.getToastManager().addToast(
+                                    SystemToast.multiline(
+                                            client,
+                                            SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+                                            Component.translatable("offlineskins.reload.notification"),
+                                            Component.translatable("toast.offlineskins.reload.success")
+                                    )
                             )
                     ));
                 })
@@ -227,9 +228,7 @@ public final class YaclSettings {
 
         Option<Integer> HDImagesResolution = Option.<Integer>createBuilder()
                 .name(Component.translatable("offlineskins-reloaded.hd_images_resolution"))
-                .description(OptionDescription.of(
-                        Component.translatable("offlineskins-reloaded.hd_images_resolution.d")
-                ))
+                .description(OptionDescription.of(Component.translatable("offlineskins-reloaded.hd_images_resolution.d")))
                 .binding(
                         128,
                         () -> options.maxHDResolution,
@@ -252,7 +251,7 @@ public final class YaclSettings {
                         defaults.linkCustomServerSkin,
                         () -> options.linkCustomServerSkin,
                         value -> {
-                            if (!options.customServersList.isElyBy()) {
+                            if (!options.customServersList.isElyBy() && !options.customServersList.isTLauncher()) {
                                 options.linkCustomServerSkin = value;
                                 setSkinUrl(value);
                             }
@@ -263,14 +262,12 @@ public final class YaclSettings {
 
         Option<String> customServerCapeUrl = Option.<String>createBuilder()
                 .name(Component.translatable("option.offlineskins-reloaded.link_custom_server_cape"))
-                .description(OptionDescription.of(
-                        Component.translatable("tooltip.offlineskins-reloaded.link_custom_server_cape")
-                ))
+                .description(OptionDescription.of(Component.translatable("tooltip.offlineskins-reloaded.link_custom_server_cape")))
                 .binding(
                         defaults.linkCustomServerCape,
                         () -> options.linkCustomServerCape,
                         value -> {
-                            if (!options.customServersList.isElyBy()) {
+                            if (!options.customServersList.isElyBy() && !options.customServersList.isTLauncher()) {
                                 options.linkCustomServerCape = value;
                                 setCapeUrl(value);
                             }
@@ -290,6 +287,19 @@ public final class YaclSettings {
                             setCurrentPreset(preset);
 
                             if (preset.isElyBy()) {
+                                options.linkCustomServerSkin = preset.getSkinUrl();
+                                options.linkCustomServerCape = preset.getCapeUrl();
+
+                                customServerSkinUrl.requestSet(options.linkCustomServerSkin);
+                                customServerCapeUrl.requestSet(options.linkCustomServerCape);
+
+                                setSkinUrl(options.linkCustomServerSkin);
+                                setCapeUrl(options.linkCustomServerCape);
+
+                                return;
+                            }
+
+                            if (preset.isTLauncher()) {
                                 options.linkCustomServerSkin = preset.getSkinUrl();
                                 options.linkCustomServerCape = preset.getCapeUrl();
 
@@ -378,22 +388,21 @@ public final class YaclSettings {
         ButtonOption openDirectoryCachedImages = ButtonOption.createBuilder()
                 .name(Component.translatable("button.offlineskins.open_cachedimages"))
                 .text(Component.translatable("button.offlineskins.open_cachedimages.t"))
-                .description(OptionDescription.of(
-                        Component.translatable("tooltip.offlineskins.open_cachedimages")))
+                .description(OptionDescription.of(Component.translatable("tooltip.offlineskins.open_cachedimages")))
                 .action((screen, option) -> {
                     Path path = Paths.get(".", "cachedImages");
                     Path skins = path.resolve("skins");
-                    Path skinsUuid = skins.resolve("uuid");
+                    Path skinsUUID = skins.resolve("uuid");
                     Path capes = path.resolve("capes");
-                    Path capesUuid = capes.resolve("uuid");
+                    Path capesUUID = capes.resolve("uuid");
 
                     try {
-                        Files.createDirectories(skinsUuid);
-                        Files.createDirectories(capesUuid);
+                        Files.createDirectories(skinsUUID);
+                        Files.createDirectories(capesUUID);
 
-                        Blaze3D.openPath(path);
+                        Util.getPlatform().openPath(path);
                     } catch (IOException e) {
-                        LOG.error("[OfflineSkins Reloaded] Failed to create/open cachedImages directories.", e);
+                        LOG.error("[OfflineSkins Reloaded] Failed to open cachedImages directories.", e);
                     }
                 })
                 .build();
@@ -436,7 +445,7 @@ public final class YaclSettings {
                 .name(Component.translatable("offlineskins-reloaded.YACL.refresh.screen"))
                 .description(OptionDescription.of(Component.translatable("offlineskins-reloaded.YACL.refresh.screen.d")))
                 .text(Component.translatable("offlineskins-reloaded.YACL.refresh.screen.t"))
-                .action((screen, option) -> client.gui.setScreen(
+                .action((screen, option) -> client.setScreen(
                         createConfigScreen(parentScreen)
                 ))
                 .build();
@@ -538,9 +547,7 @@ public final class YaclSettings {
             Option<Component> emptyList = Option.<Component>createBuilder()
                     .name(Component.empty())
                     .description(OptionDescription.EMPTY)
-                    .stateManager(StateManager.createImmutable(
-                            Component.translatable("empty.list.skins")
-                    ))
+                    .stateManager(StateManager.createImmutable(Component.translatable("empty.list.skins")))
                     .customController(LabelController::new)
                     .build();
 
@@ -643,9 +650,7 @@ public final class YaclSettings {
             Option<Component> emptyList = Option.<Component>createBuilder()
                     .name(Component.empty())
                     .description(OptionDescription.EMPTY)
-                    .stateManager(StateManager.createImmutable(
-                            Component.translatable("empty.list.capes")
-                    ))
+                    .stateManager(StateManager.createImmutable(Component.translatable("empty.list.capes")))
                     .customController(LabelController::new)
                     .build();
 
@@ -883,7 +888,7 @@ public final class YaclSettings {
                                                 .action((screen, option) ->
                                                         ConfirmLinkScreen.confirmLinkNow(
                                                                 screen,
-                                                                URI.create("https://discord.gg/KgscJEE5B"),
+                                                                "https://discord.gg/JesZkMUGen",
                                                                 true
                                                         ))
                                                 .build()
@@ -895,10 +900,22 @@ public final class YaclSettings {
                                                 .action((screen, option) ->
                                                         ConfirmLinkScreen.confirmLinkNow(
                                                                 screen,
-                                                                URI.create("https://modrinth.com/mod/offlineskins-reloaded"),
+                                                                "https://modrinth.com/mod/offlineskins-reloaded",
                                                                 true
                                                         ))
                                                 .build()
+                                )
+                                .option(ButtonOption.createBuilder()
+                                            .name(Component.literal("CurseForge"))
+                                            .text(Component.literal(""))
+                                            .description(OptionDescription.of(Component.translatable("menu.faqs.curseforge.answer")))
+                                            .action((screen, option) ->
+                                                        ConfirmLinkScreen.confirmLinkNow(
+                                                                screen,
+                                                                "https://www.curseforge.com/minecraft/mc-mods/offlineskins-reloaded",
+                                                                true
+                                                        ))
+                                            .build()
                                 )
                                 .option(ButtonOption.createBuilder()
                                                 .name(Component.literal("GitHub"))
@@ -907,7 +924,7 @@ public final class YaclSettings {
                                                 .action((screen, option) ->
                                                         ConfirmLinkScreen.confirmLinkNow(
                                                                 screen,
-                                                                URI.create("https://github.com/VoreZ78/OfflineSkins-Reloaded"),
+                                                                "https://github.com/VoreZ78/OfflineSkins-Reloaded",
                                                                 true
                                                         ))
                                                 .build()
@@ -932,7 +949,7 @@ public final class YaclSettings {
                                                 .action((screen, option) ->
                                                         ConfirmLinkScreen.confirmLinkNow(
                                                                 screen,
-                                                                URI.create("https://github.com/VoreZ78/OfflineSkins-Reloaded/issues"),
+                                                                "https://github.com/VoreZ78/OfflineSkins-Reloaded/issues",
                                                                 true
                                                         ))
                                                 .build()
@@ -944,7 +961,7 @@ public final class YaclSettings {
                                                 .action((screen, option) ->
                                                         ConfirmLinkScreen.confirmLinkNow(
                                                                 screen,
-                                                                URI.create("https://discord.gg/KgscJEE5B"),
+                                                                "https://discord.gg/JesZkMUGen",
                                                                 true
                                                         ))
                                                 .build()
@@ -981,10 +998,6 @@ public final class YaclSettings {
                 .category(FAQCategory)
                 .category(debugCategory)
                 .save(() -> {
-                    if (options.customServersList.isElyBy()) {
-                        options.linkCustomServerSkin = options.customServersList.getSkinUrl();
-                        options.linkCustomServerCape = options.customServersList.getCapeUrl();
-                    }
                     if (options.customServersList.isGithub()) {
                         options.linkCustomServerSkin = prepareGitHub(options.linkCustomServerSkin);
                         options.linkCustomServerCape = prepareGitHub(options.linkCustomServerCape);

@@ -3,7 +3,7 @@
   "id": "offlineskins-reloaded",
   "version": "${version}",
   "name": "OfflineSkins Reloaded",
-  "description": "Offline skins and capes support. Original mod by Zlainsama. Port to Minecraft 26.3 by VoreZ.",
+  "description": "Cache your local skins and capes for offline play!\n\nOriginally created by zlainsama (LainMI)",
   "authors": [
     "zlainsama",
     "VoreZ"
@@ -16,8 +16,9 @@
   "custom": {
     "modmenu": {
       "links": {
-        "modmenu.discord": "https://discord.gg/KgscJEE5B",
-        "modmenu.modrinth": "https://modrinth.com/mod/offlineskins-reloaded"
+        "modmenu.discord": "https://discord.gg/JesZkMUGen",
+        "modmenu.modrinth": "https://modrinth.com/mod/offlineskins-reloaded",
+        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/offlineskins-reloaded"
       },
       "update_checker": true
     }
@@ -37,14 +38,14 @@
     "offlineskins-reloaded-mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.19.5",
-    "minecraft": "26.3",
-    "yet_another_config_lib_v3": ">=3.9.7+26.3-fabric",
-    "java": ">=25",
-    "fabric-api": ">=0.162.0+26.3"
+    "fabricloader": ">=0.19.3",
+    "minecraft": ">=1.21.6 <=1.21.8",
+    "yet_another_config_lib_v3": ">=3.8.2+1.21.6-fabric",
+    "java": ">=21",
+    "fabric-api": ">=0.128.2+1.21.6"
   },
   "recommends": {
-    "modmenu": ">=21.0.0",
-    "yet_another_config_lib_v3": ">=3.9.7+26.3-fabric"
+    "modmenu": ">=15.0.2",
+    "yet_another_config_lib_v3": ">=3.8.2+1.21.6-fabric"
   }
 }

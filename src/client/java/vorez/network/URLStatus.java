@@ -17,6 +17,7 @@ public enum URLStatus {
     SUCCESS,
 
     // default
+    AFTER_AUTO,
     URL_EMPTY,
     IS_EXAMPLE_COM,
     CUSTOM_SERVER_DISABLED,
