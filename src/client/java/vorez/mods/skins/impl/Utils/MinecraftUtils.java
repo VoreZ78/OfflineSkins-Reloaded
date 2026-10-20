@@ -1,6 +1,7 @@
 package vorez.mods.skins.impl.Utils;
 
-import com.mojang.authlib.minecraft.SessionService;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import net.minecraft.client.Minecraft;
 
 import java.net.Proxy;
@@ -11,7 +12,8 @@ public class MinecraftUtils {
         return Minecraft.getInstance().getProxy();
     }
 
-    public static SessionService getSessionService() {
-        return Minecraft.getInstance().services().sessionService();
+    public static MinecraftSessionService getSessionService() {
+        YggdrasilAuthenticationService authService = new YggdrasilAuthenticationService(getProxy());
+        return authService.createMinecraftSessionService();
     }
 }

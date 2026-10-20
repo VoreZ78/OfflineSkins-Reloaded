@@ -1,12 +1,12 @@
 package vorez.mods.skins.init.fabric.mixins;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,15 +19,15 @@ import vorez.mods.skins.impl.YaclSettings;
 public abstract class TitleScreenMixin extends Screen {
 
     @Unique
-    private static final Identifier BUTTON_TEXTURE =
-            Identifier.fromNamespaceAndPath(
+    private static final ResourceLocation BUTTON_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
                     "offlineskins-reloaded",
                     "maintitlescreenbutton.png"
             );
 
     @Unique
-    private static final Identifier BUTTON_HIGHLIGHT_TEXTURE =
-            Identifier.fromNamespaceAndPath(
+    private static final ResourceLocation BUTTON_HIGHLIGHT_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
                     "offlineskins-reloaded",
                     "maintitlescreenbuttonhighlighting.png"
             );
@@ -38,6 +38,9 @@ public abstract class TitleScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void offlineSkinsTitleScreenButton(CallbackInfo ci) {
+        if (this.minecraft == null) {
+            return;
+        }
 
         int x = this.width / 2 - 132;
         int y = this.height / 4 + 55;
@@ -46,7 +49,7 @@ public abstract class TitleScreenMixin extends Screen {
                 new ConfigButton(
                         x,
                         y,
-                        button -> this.minecraft.gui.setScreen(
+                        button -> this.minecraft.setScreen(
                                 YaclSettings.createConfigScreen(this)
                         )
                 )
@@ -66,13 +69,13 @@ public abstract class TitleScreenMixin extends Screen {
             );
         }
         @Override
-        protected void extractContents(
-                GuiGraphicsExtractor graphics,
+        protected void renderWidget(
+                GuiGraphics graphics,
                 int mouseX,
                 int mouseY,
                 float partialTick
         ) {
-            Identifier texture = this.isHovered()
+            ResourceLocation texture = this.isHovered()
                     ? BUTTON_HIGHLIGHT_TEXTURE
                     : BUTTON_TEXTURE;
 

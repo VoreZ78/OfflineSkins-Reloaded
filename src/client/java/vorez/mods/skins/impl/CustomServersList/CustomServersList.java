@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 
 public enum CustomServersList {
     ELY_BY("Ely.by", "http://skinsystem.ely.by/skins/%auto%", ""),
+    T_LAUNCHER("TLauncher", "https://auth.tlauncher.org/skin/fileservice/skins/skin_%auto%", "https://tlauncher.org/upload/all/cloaks/%auto%"),
     GITHUB("GitHub", "", ""),
     CUSTOM("custom.url", "", "");
 
@@ -32,6 +33,10 @@ public enum CustomServersList {
 
     public boolean isElyBy() {
         return this == ELY_BY;
+    }
+
+    public boolean isTLauncher() {
+        return this == T_LAUNCHER;
     }
 
     public boolean isGithub() {

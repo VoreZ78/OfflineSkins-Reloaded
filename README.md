@@ -4,7 +4,7 @@
 
 **Offline skins & capes for Minecraft**
 
-Fabric · 26.3
+Fabric · 1.21.6 — 1.21.8
 
 <br>
 

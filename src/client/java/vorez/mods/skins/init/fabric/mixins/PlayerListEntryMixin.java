@@ -2,7 +2,7 @@ package vorez.mods.skins.init.fabric.mixins;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

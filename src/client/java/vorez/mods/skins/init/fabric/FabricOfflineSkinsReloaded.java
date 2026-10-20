@@ -11,7 +11,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import vorez.mods.skins.api.SkinProviderAPI;
@@ -47,7 +47,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     private static final Logger LOG = LogUtils.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Path CONFIG_PATH = Paths.get(".", "config", "offlineskins-reloaded.json");
-    private static final Map<String, Identifier> textures = new ConcurrentHashMap<>();
+    private static final Map<String, ResourceLocation> textures = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> skinAppearanceDelayUntil = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> capeAppearanceDelayUntil = new ConcurrentHashMap<>();
 
@@ -56,8 +56,8 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
 
     private static volatile ConfigOptions lastLoadedConfig = new ConfigOptions().defaultOptions();
 
-    private static Identifier generateRandomLocation() {
-        return Identifier.fromNamespaceAndPath("offlineskins-reloaded", String.format("textures/generated/%s", UUID.randomUUID()));
+    private static ResourceLocation generateRandomLocation() {
+        return ResourceLocation.fromNamespaceAndPath("offlineskins-reloaded", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     private static String textureKey(ByteBuffer data) {
@@ -75,7 +75,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         }
     }
 
-    public static Identifier getLocationSkin(GameProfile profile) {
+    public static ResourceLocation getLocationSkin(GameProfile profile) {
         if (isSkinAppearanceDelayed(profile)) {
             return null;
         }
@@ -89,7 +89,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         }
         return null;
     }
-    public static Identifier getLocationCape(GameProfile profile) {
+    public static ResourceLocation getLocationCape(GameProfile profile) {
         if (isCapeAppearanceDelayed(profile)) {
             return null;
         }
@@ -104,7 +104,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         return null;
     }
 
-    public static Identifier getUnofficialLocationSkin(GameProfile profile) {
+    public static ResourceLocation getUnofficialLocationSkin(GameProfile profile) {
         if (isSkinAppearanceDelayed(profile)) {
             return null;
         }
@@ -123,12 +123,12 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         int delay = lastLoadedConfig.appearanceDelay;
 
         if (delay <= 0) {
-            skinAppearanceDelayUntil.remove(profile.id());
+            skinAppearanceDelayUntil.remove(profile.getId());
             return;
         }
 
         skinAppearanceDelayUntil.put(
-                profile.id(),
+                profile.getId(),
                 System.currentTimeMillis() + delay
         );
     }
@@ -137,12 +137,12 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         int delay = lastLoadedConfig.appearanceDelay;
 
         if (delay <= 0) {
-            capeAppearanceDelayUntil.remove(profile.id());
+            capeAppearanceDelayUntil.remove(profile.getId());
             return;
         }
 
         capeAppearanceDelayUntil.put(
-                profile.id(),
+                profile.getId(),
                 System.currentTimeMillis() + delay
         );
     }
@@ -166,13 +166,13 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     }
 
     private static boolean isSkinAppearanceDelayed(GameProfile profile) {
-        Long until = skinAppearanceDelayUntil.get(profile.id());
+        Long until = skinAppearanceDelayUntil.get(profile.getId());
 
         if (until == null)
             return false;
 
         if (System.currentTimeMillis() >= until) {
-            skinAppearanceDelayUntil.remove(profile.id(), until);
+            skinAppearanceDelayUntil.remove(profile.getId(), until);
             return false;
         }
 
@@ -180,21 +180,21 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     }
 
     private static boolean isCapeAppearanceDelayed(GameProfile profile) {
-        Long until = capeAppearanceDelayUntil.get(profile.id());
+        Long until = capeAppearanceDelayUntil.get(profile.getId());
 
         if (until == null)
             return false;
 
         if (System.currentTimeMillis() >= until) {
-            capeAppearanceDelayUntil.remove(profile.id(), until);
+            capeAppearanceDelayUntil.remove(profile.getId(), until);
             return false;
         }
 
         return true;
     }
 
-    private static Identifier registerTexture(ByteBuffer data, ISkin skin, String key) throws IOException {
-        Identifier location = generateRandomLocation();
+    private static ResourceLocation registerTexture(ByteBuffer data, ISkin skin, String key) throws IOException {
+        ResourceLocation location = generateRandomLocation();
         ByteBuffer readBuffer = data.asReadOnlyBuffer();
         readBuffer.rewind();
         DynamicTexture texture = new DynamicTexture(location::toString, NativeImage.read(readBuffer));
@@ -216,13 +216,13 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         return location;
     }
 
-    private static Identifier getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
+    private static ResourceLocation getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
         String key = textureKey(data);
         if (key == null) {
             return null;
         }
 
-        Identifier existing = textures.get(key);
+        ResourceLocation existing = textures.get(key);
         if (existing != null) {
             return existing;
         }
@@ -233,7 +233,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         }
 
         CountDownLatch latch = new CountDownLatch(1);
-        AtomicReference<Identifier> result = new AtomicReference<>();
+        AtomicReference<ResourceLocation> result = new AtomicReference<>();
         AtomicReference<IOException> error = new AtomicReference<>();
         client.execute(() -> {
             try {
@@ -257,7 +257,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
         return result.get();
     }
 
-    private static Identifier getOrCreateTextureNullable(ByteBuffer data, ISkin skin) {
+    private static ResourceLocation getOrCreateTextureNullable(ByteBuffer data, ISkin skin) {
         try {
             return getOrCreateTexture(data, skin);
         } catch (IOException e) {
@@ -266,7 +266,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
     }
 
     public static String getSkinType(GameProfile profile) {
-        Identifier location = getLocationSkin(profile);
+        ResourceLocation location = getLocationSkin(profile);
         if (location != null) {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
             if (skin != null && skin.isDataReady()) {
@@ -552,7 +552,7 @@ public class FabricOfflineSkinsReloaded implements ClientModInitializer {
             for (Player player : mc.level.players()) {
                 UUID uuid = player.getUUID();
 
-                RetryState state = skinInitialization.computeIfAbsent(uuid, _ -> new RetryState(0, gameTime));
+                RetryState state = skinInitialization.computeIfAbsent(uuid, k -> new RetryState(0, gameTime));
 
                 if (state.attempts < MAX_ATTEMPTS && gameTime >= state.nextAttemptTick) {
                     PlayerProfile profile =
