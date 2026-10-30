@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "vorez.mods.skins.init.forge.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "offlineskins-reloaded-refmap.json",
+  "client": [
+    "PlayerListEntryMixin",
+    "SkullBlockRendererMixin",
+    "PlayerListHudMixin",
+    "PauseScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
