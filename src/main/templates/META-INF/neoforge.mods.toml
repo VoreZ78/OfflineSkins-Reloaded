@@ -1,0 +1,44 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+
+displayURL="https://modrinth.com/mod/offlineskins-reloaded"
+
+logoFile="icon.png"
+
+authors="VoreZ, zlainsama"
+
+description='''
+OfflineSkins Reloaded for NeoForge.
+Caches player skins and capes for offline use.
+
+With the user-friendly menu!
+'''
+
+[[dependencies.${mod_id}]]
+modId="neoforge"
+type="required"
+versionRange="[${neo_version},)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.${mod_id}]]
+modId="yet_another_config_lib_v3"
+mandatory=true
+versionRange="[3.8.2,)"
+ordering="AFTER"
+side="CLIENT"
+
+[[mixins]]
+config="offlineskins-reloaded-mixins.json"

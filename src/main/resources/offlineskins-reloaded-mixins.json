@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "vorez.mods.skins.init.neoforge.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "PlayerListEntryMixin",
+    "SkullBlockRendererMixin",
+    "PlayerListHudMixin",
+    "PauseScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
